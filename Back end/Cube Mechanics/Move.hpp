@@ -7,6 +7,9 @@ private:
     int layer;
     int times;
 public:
+    Move(){
+        
+    }
     Move(Axis axis, int layer, int times){
         this->axis = axis;
         this->layer = layer;
@@ -25,3 +28,4 @@ public:
         return times;
     }
 };
+

@@ -8,5 +8,6 @@ enum class Color{
     BLUE,
     GREEN,
     RED,
-    ORANGE
+    ORANGE,
+    EMPTY
 };
