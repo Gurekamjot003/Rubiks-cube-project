@@ -27,13 +27,13 @@ public:
         }
         else if(type == RotateType::UP){
             FaceEnum temp = front_face;
-            front_face = get_opposite_face(up_face);
-            up_face = temp;
+            front_face = up_face;
+            up_face = get_opposite_face(temp);
         }
         else if(type == RotateType::DOWN){
             FaceEnum temp = front_face;
-            front_face = up_face;
-            up_face = get_opposite_face(temp);
+            front_face = get_opposite_face(up_face);
+            up_face = temp;
         }
         else if(type == RotateType::CLOCKWISE){
             FaceEnum temp = up_face;
