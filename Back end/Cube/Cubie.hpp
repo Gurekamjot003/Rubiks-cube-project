@@ -3,31 +3,11 @@
 #include "FaceEnum.hpp"
 #include "CubieType.hpp"
 #include "../Cube Mechanics/Axis.hpp"
+#include "../Cube Mechanics/RotationMove.hpp"
+
 
 class Move;
-
-
-map<Axis, vector<FaceEnum>> next_face_mp = {
-    {Axis::X, {
-        FaceEnum::UP,
-        FaceEnum::BACK,
-        FaceEnum::DOWN,
-        FaceEnum::FRONT
-    }},
-    {Axis::Y, {
-        FaceEnum::FRONT,
-        FaceEnum::LEFT,
-        FaceEnum::BACK,
-        FaceEnum::RIGHT
-    }},
-    {Axis::Z, {
-        FaceEnum::UP,
-        FaceEnum::RIGHT,
-        FaceEnum::DOWN,
-        FaceEnum::LEFT
-    }}
-    
-};
+class CubieRotator;
 class Cubie{
 private:
     map<FaceEnum, Color> colors;
@@ -46,11 +26,19 @@ public:
         else type = CubieType::EMPTY;
     }
 
+    map<FaceEnum, Color> get_colors(){
+        return colors;
+    }
+
+    void set_colors(map<FaceEnum, Color> new_colors){
+        colors = new_colors;
+    }
+
     CubieType get_type(){
         return type;
     }
 
-    Color get_color(FaceEnum face){
+    Color get_color_from_face(FaceEnum face){
         if(colors.find(face) == colors.end()) return Color::EMPTY;
         return colors[face];
     }
@@ -63,9 +51,21 @@ public:
         return true;
     }
 
-    void set_color(FaceEnum face, Color color){
+    void set_color_by_face(FaceEnum face, Color color){
         colors[face] = color;
     }
 
-    void rotate_cubie(Axis axis, int layer, int num_rotations);
+    void rotate_cubie(RotationMove move);
 };
+
+class CubeGeometryUtils;
+class CubieRotator{
+    public: 
+    CubieRotator() = delete;
+
+    static void rotate_cubie(Cubie* cubie, RotationMove move);
+};
+
+void Cubie::rotate_cubie(RotationMove move){
+    CubieRotator::rotate_cubie(this, move);
+}
