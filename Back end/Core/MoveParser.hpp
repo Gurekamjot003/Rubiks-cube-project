@@ -65,18 +65,20 @@ class MoveParser{
             bool is_even_cube = (cube->get_size() % 2 == 0);
             int mid_layer = cube->get_size()/2 + 1;
             string ans;
+            
+            string mid_layer = to_string(cube->get_size()/2 + 1);
             for(auto& ch: token){
                 if(tolower(ch) == 'm'){
                     if(is_even_cube) throw invalid_argument("invalid move - even cubes don't have this move");
-                    ans += "2L";
+                    ans += mid_layer + "L";
                 }
                 else if(tolower(ch) == 'e'){
                     if(is_even_cube) throw invalid_argument("invalid move - even cubes don't have this move");
-                    ans += "2D";
+                    ans += mid_layer+"D";
                 }
                 else if(tolower(ch) == 's'){
                     if(is_even_cube) throw invalid_argument("invalid move - even cubes don't have this move");
-                    ans += "2F";
+                    ans += mid_layer+"F";
                 }
                 else ans.push_back(ch);
             }
