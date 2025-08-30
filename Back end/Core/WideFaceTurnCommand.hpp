@@ -18,8 +18,9 @@ public:
             moves.push_back(move);
             layer+=d;
         }
+        CubeRotator* rotator = new CubeRotator(cube);
         for(auto& move: moves){
-            cube->apply_move(move);
+            rotator->rotate_cube(move);
         }
     }
 };

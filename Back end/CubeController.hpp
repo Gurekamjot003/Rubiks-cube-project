@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/MoveParser.hpp"
 #include "Cube solving algorithms/CubeSolverFactory.hpp"
+#include "Cube Mechanics/CameraDisplayer.hpp"
 
 
 class CubeController{
@@ -8,12 +9,14 @@ private:
     Cube* cube;
     CubeSolver* solver;
     Camera* camera;
+    CameraDisplayer* displayer;
 
 public:
     CubeController(int n){
         cube = new Cube(n);
         solver = CubeSolverFactory::get_solver(SolverType::LBL, cube);
         camera = new Camera();
+        displayer = new CameraDisplayer(camera);
     }
 
     void solve(){
@@ -38,7 +41,8 @@ public:
 
 
     void display_cube(){
-        camera->display(cube);
+        
+        displayer->display(cube);
     }
 
     bool is_cube_solvable(){

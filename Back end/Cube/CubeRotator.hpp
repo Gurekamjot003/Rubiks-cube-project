@@ -8,9 +8,9 @@ class CubeRotator{
     void d1_transpose(Axis axis, int layer){
         for(int i = 0; i<(n-1); i++){
             for(int j = i+1; j<n; j++){
-                auto[r1,c1] = CubeGeometryUtils::get_abs_coordinates(axis, i, j, cube);
-                auto[r2,c2] = CubeGeometryUtils::get_abs_coordinates(axis, j, i, cube);
-                cube->swap_cubies(axis, layer, r1, c1, r2, c2);
+                Coordinate from = CubeGeometryUtils::get_abs_coordinates(axis, Coordinate(i, j), cube);
+                Coordinate to = CubeGeometryUtils::get_abs_coordinates(axis, Coordinate(j, i), cube);
+                cube->swap_cubies(axis, layer, from, to);
             }
         }
     }
@@ -18,9 +18,9 @@ class CubeRotator{
     void d2_transpose(Axis axis, int layer){
         for(int i = 0; i<(n-1); i++){
             for(int j = (n-2-i); j>=0; j--){
-                auto[r1,c1] = CubeGeometryUtils::get_abs_coordinates(axis, i, j, cube);
-                auto[r2,c2] = CubeGeometryUtils::get_abs_coordinates(axis, n-1-j, n-1-i, cube);
-                cube->swap_cubies(axis, layer, r1, c1, r2, c2);
+                Coordinate from = CubeGeometryUtils::get_abs_coordinates(axis, Coordinate(i, j), cube);
+                Coordinate to = CubeGeometryUtils::get_abs_coordinates(axis, Coordinate(n-1-j, n-1-i), cube);
+                cube->swap_cubies(axis, layer, from, to);
             }
         }
     }
@@ -28,9 +28,9 @@ class CubeRotator{
     void row_reverse(Axis axis, int layer){
         for(int i = 0; i<n; i++){
             for(int j = 0; j<(n/2); j++){
-                auto[r1,c1] = CubeGeometryUtils::get_abs_coordinates(axis, i, j, cube);
-                auto[r2,c2] = CubeGeometryUtils::get_abs_coordinates(axis, i, n-1-j, cube);
-                cube->swap_cubies(axis, layer, r1, c1, r2, c2);
+                Coordinate from = CubeGeometryUtils::get_abs_coordinates(axis, Coordinate(i, j), cube);
+                Coordinate to = CubeGeometryUtils::get_abs_coordinates(axis, Coordinate(i, n-1-j), cube);
+                cube->swap_cubies(axis, layer, from, to);
             }
         }
     }
@@ -38,9 +38,9 @@ class CubeRotator{
     void column_reverse(Axis axis, int layer){
         for(int j = 0; j<n; j++){
             for(int i = 0; i<(n/2); i++){
-                auto[r1,c1] = CubeGeometryUtils::get_abs_coordinates(axis, i, j, cube);
-                auto[r2,c2] = CubeGeometryUtils::get_abs_coordinates(axis, n-1-i, j, cube);
-                cube->swap_cubies(axis, layer, r1, c1, r2, c2);
+                Coordinate from = CubeGeometryUtils::get_abs_coordinates(axis, Coordinate(i, j), cube);
+                Coordinate to = CubeGeometryUtils::get_abs_coordinates(axis, Coordinate(n-1-i, j), cube);
+                cube->swap_cubies(axis, layer, from, to);
             }
         }
     }
@@ -56,10 +56,10 @@ public:
         int num_rotations = move.get_times();
 
         // cubies internal move
-        vector<Cubie*> cubies_in_layer = cube->get_cubies_in_layer(axis, layer);
-        for(auto& cubie: cubies_in_layer){
-            RotationMove rotation_move(axis, num_rotations);
-            cubie->rotate_cubie(rotation_move);
+        vector<vector<Cubie*>> cubies_in_layer = cube->get_cubies_in_layer(axis, layer);
+        RotationMove rotation_move(axis, num_rotations);
+        for(auto& cubie_row: cubies_in_layer){
+            for(auto& cubie: cubie_row) cubie->rotate_cubie(rotation_move);
         }
         
         //apply move
@@ -71,9 +71,3 @@ public:
     }
 
 };
-
-
-void Cube::apply_move(Move move){
-    if(!rotator) rotator = new CubeRotator(this);
-    rotator->rotate_cube(move);
-}

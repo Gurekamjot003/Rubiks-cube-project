@@ -11,6 +11,7 @@ public:
     
     void execute(Cube* cube, Camera* camera) override{
         Move move(axis, layer, times);
-        cube->apply_move(move);
+        CubeRotator* rotator = new CubeRotator(cube);
+        rotator->rotate_cube(move);
     }
 };

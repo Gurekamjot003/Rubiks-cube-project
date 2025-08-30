@@ -63,10 +63,10 @@ class MoveParser{
     public:
         static void standardize(string& token, Cube* cube){
             bool is_even_cube = (cube->get_size() % 2 == 0);
-            int mid_layer = cube->get_size()/2 + 1;
+            int mid_layer_int = cube->get_size()/2 + 1;
             string ans;
             
-            string mid_layer = to_string(cube->get_size()/2 + 1);
+            string mid_layer = to_string(mid_layer_int);
             for(auto& ch: token){
                 if(tolower(ch) == 'm'){
                     if(is_even_cube) throw invalid_argument("invalid move - even cubes don't have this move");

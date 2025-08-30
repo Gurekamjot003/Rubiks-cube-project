@@ -43,7 +43,7 @@ public:
         return colors[face];
     }
 
-    bool faces_present(vector<FaceEnum> faces){
+    bool check_faces_present(vector<FaceEnum> faces){
         if(faces.size() != colors.size()) return false;
         for(auto& face: faces){
             if(colors.find(face) == colors.end()) return false;
@@ -55,7 +55,7 @@ public:
         colors[face] = color;
     }
 
-    void rotate_cubie(RotationMove move);
+    void rotate_cubie(RotationMove& move);
 };
 
 class CubeGeometryUtils;
@@ -63,9 +63,9 @@ class CubieRotator{
     public: 
     CubieRotator() = delete;
 
-    static void rotate_cubie(Cubie* cubie, RotationMove move);
+    static void rotate_cubie(Cubie* cubie, RotationMove& move);
 };
 
-void Cubie::rotate_cubie(RotationMove move){
+void Cubie::rotate_cubie(RotationMove& move){
     CubieRotator::rotate_cubie(this, move);
 }

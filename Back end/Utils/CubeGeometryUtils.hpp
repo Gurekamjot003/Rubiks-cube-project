@@ -79,16 +79,17 @@ public:
         return Direction::CLOCKWISE;
     }
 
-    static pair<int, int> get_abs_coordinates(Axis axis, int i, int j, Cube* cube){
+    static Coordinate get_abs_coordinates(Axis axis, Coordinate coordinate, Cube* cube){
         int n = cube->get_size();
+        int i = coordinate.get_x(), j = coordinate.get_y();
         if(axis == Axis::X){
-            return {n-1-i, n-1-j};
+            return Coordinate(n-1-i, n-1-j);
         }
         else if(axis == Axis::Y){
-            return {j, i};
+            return Coordinate(j, i);
         }
         else if(axis == Axis::Z){
-            return {n-1-j, i};
+            return Coordinate(n-1-j, i);
         }
         return {};
     }
@@ -107,6 +108,12 @@ public:
         return next_faces[new_idx];
     }
 
+    static vector<vector<Cubie*>> get_cubies_by_face(FaceEnum face, Cube* cube, Coordinate top_left = Coordinate(0,0), Coordinate top_right = Coordinate(0, 1)){
+        Axis axis = CubeGeometryUtils::get_axis_from_face(face);
+        int layer = CubeGeometryUtils::get_layer_from_face(face, cube);
+
+        return cube->get_cubies_in_layer(axis, layer, top_left, top_right);
+    }
 };
 
 vector<char> rotation_moves_arr = {'x', 'y', 'z'};
@@ -134,7 +141,7 @@ map<Axis, vector<FaceEnum>> CubeGeometryUtils::next_face_mp = {
 
 
 
-void CubieRotator::rotate_cubie(Cubie* cubie, RotationMove move){
+void CubieRotator::rotate_cubie(Cubie* cubie, RotationMove& move){
     Axis axis = move.get_axis();
     int num_rotations = move.get_times();
 

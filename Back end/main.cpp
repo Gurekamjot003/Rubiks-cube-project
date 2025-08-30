@@ -1,7 +1,7 @@
 #include "CubeController.hpp"
 
 int main(){
-    CubeController c(3);
+    CubeController c(10);
 
     c.display_cube();
     while(true){

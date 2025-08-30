@@ -3,6 +3,7 @@
 #include "Cubie.hpp"
 #include "../Cube Mechanics/Move.hpp"
 #include "../Cube Mechanics/RotationMove.hpp"
+#include "Coordinate.hpp"
 
 
 class CubeRotator;
@@ -15,7 +16,7 @@ private:
     CubeRotator* rotator;
     int n;
 
-    
+    vector<Coordinate> corner_piece_coordinates;
 public:
     Cube(int n):n(n),rotator(nullptr){
         is_solved = true;
@@ -35,19 +36,23 @@ public:
                 }
             }
         }
+        corner_piece_coordinates = {Coordinate(0, 0), Coordinate(0, n-1), Coordinate(n-1, 0), Coordinate(n-1, n-1)};
     }
 
-    void swap_cubies(Axis axis, int layer, int r_from, int c_from, int r_to, int c_to){
+    void swap_cubies(Axis axis, int layer, Coordinate from, Coordinate to){
+        int r_from = from.get_x();
+        int c_from = from.get_y();
+        int r_to = to.get_x();
+        int c_to = to.get_y();
         if(axis == Axis::X) swap(cubies[layer][r_from][c_from], cubies[layer][r_to][c_to]);
         else if(axis == Axis::Y) swap(cubies[r_from][layer][c_from], cubies[r_to][layer][c_to]);
         else if(axis == Axis::Z) swap(cubies[r_from][c_from][layer], cubies[r_to][c_to][layer]);
     }
 
-    Cubie* get_cubie(int x, int y, FaceEnum face);
+    Cubie* get_cubie(Coordinate coordinate, FaceEnum face);
         
-    void set_color(FaceEnum face, int x, int y, Color color){
-        
-        Cubie* target_cubie = get_cubie(x, y, face);
+    void set_color(FaceEnum face, Coordinate coordinate, Color color){
+        Cubie* target_cubie = get_cubie(coordinate, face);
 
         target_cubie->set_color_by_face(face, color);
     }
@@ -56,47 +61,60 @@ public:
         //scramble cube
     }
 
-    vector<Cubie*> get_cubies_in_layer(Axis axis, int layer){
-        vector<Cubie*> cubies_in_layer;
-        int n = cubies.size();
-        if(axis == Axis::X){
-            for(int j=0; j<n; ++j){
-                for(int k=0; k<n; ++k){
-                    cubies_in_layer.push_back(cubies[layer][j][k]);
+    vector<vector<Cubie*>> get_cubies_in_layer(Axis axis, int layer, Coordinate top_left = Coordinate(0, 0), Coordinate top_right = Coordinate(0, 1)){
+        int di = 1, end_i = n;
+        int dj = 1, end_j = n;
+        int start_i = top_left.get_x(), start_j = top_left.get_y();
+        if(start_i != 0){
+            end_i = -1;
+            di = -1;
+        }
+        if(start_j != 0){
+            end_j = -1;
+            dj = -1;
+        }
+        
+        vector<vector<Cubie*>> cubies_in_layer;
+        if(top_left.get_x() == top_right.get_x()){ // loop x befor y
+            for(int i = start_i; i != end_i; i+=di){
+                vector<Cubie*> cur_row;
+                for(int j = start_j; j!=end_j; j+=dj){
+                    if(axis == Axis::X) cur_row.push_back(cubies[layer][i][j]);
+                    else if(axis == Axis::Y) cur_row.push_back(cubies[i][layer][j]);
+                    else if(axis == Axis::Z) cur_row.push_back(cubies[i][j][layer]);
                 }
-            }
-        } else if (axis == Axis::Y){
-            for(int i=0; i<n; ++i){
-                for(int k=0; k<n; ++k){
-                    cubies_in_layer.push_back(cubies[i][layer][k]);
-                }
-            }
-        } else if (axis == Axis::Z){
-            for(int i=0; i<n; ++i){
-                for(int j=0; j<n; ++j){
-                    cubies_in_layer.push_back(cubies[i][j][layer]);
-                }
+                cubies_in_layer.push_back(cur_row);
             }
         }
+        else{ // loop y before x
+            for(int j = start_j; j!=end_j; j+=dj){
+                vector<Cubie*> cur_row;
+                for(int i = start_i; i != end_i; i+=di){
+                    if(axis == Axis::X) cur_row.push_back(cubies[layer][i][j]);
+                    else if(axis == Axis::Y) cur_row.push_back(cubies[i][layer][j]);
+                    else if(axis == Axis::Z) cur_row.push_back(cubies[i][j][layer]);
+                }
+                cubies_in_layer.push_back(cur_row);
+            }   
+        }
+        
         return cubies_in_layer;
     }
 
-    vector<Cubie*> get_cubies_by_face(FaceEnum face){
-        vector<Cubie*> ans;
-        for(int i = 0; i<n; i++){
-            for(int j = 0; j<n; j++){
-                for(int k = 0; k<n; k++){
-                    Cubie* cur = cubies[i][j][k];
-                    if(cur->get_color_from_face(face) != Color::EMPTY){
-                        ans.push_back(cur);
-                    }
-                }
-            }
+    Coordinate get_corner_piece_coordinate_with_required_faces(Axis axis, int layer, vector<FaceEnum> required_faces){
+
+        for(auto&coor: corner_piece_coordinates){
+            int i = coor.get_x();
+            int j = coor.get_y();
+            Cubie* cubie_to_search;
+            if(axis == Axis::X) cubie_to_search = cubies[layer][i][j];
+            else if(axis == Axis::Y) cubie_to_search = cubies[i][layer][j];
+            else if(axis == Axis::Z) cubie_to_search = cubies[i][j][layer];
+
+            if(cubie_to_search->check_faces_present(required_faces)) return coor;
         }
-        return ans;
+        return Coordinate();
     }
-    
-    void apply_move(Move move);
     
     int get_size(){
         return n;

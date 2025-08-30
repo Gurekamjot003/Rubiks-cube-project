@@ -10,6 +10,7 @@ public:
 
     void execute(Cube* cube, Camera* camera) override{
         RotationMove move(axis, times);
-        camera->rotate(move);
+        CameraRotator* cameraRotator = new CameraRotator(camera);
+        cameraRotator->rotate_camera(move);
     }
 };
