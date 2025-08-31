@@ -4,6 +4,9 @@
 #include "CubieType.hpp"
 #include "../Cube Mechanics/Axis.hpp"
 #include "../Cube Mechanics/RotationMove.hpp"
+#include <map>
+#include <vector>
+using namespace std;
 
 
 class Move;

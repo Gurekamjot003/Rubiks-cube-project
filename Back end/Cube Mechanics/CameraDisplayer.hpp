@@ -1,5 +1,6 @@
 #pragma once
 #include "../Utils/CameraUtils.hpp"
+#include <iostream>
 
 class CameraDisplayer{
     Camera* camera;

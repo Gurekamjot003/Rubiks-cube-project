@@ -4,6 +4,7 @@
 #include "../Cube Mechanics/Move.hpp"
 #include "../Cube Mechanics/RotationMove.hpp"
 #include "Coordinate.hpp"
+#include <set>
 
 
 class CubeRotator;
@@ -199,4 +200,3 @@ public:
     }
 
 };
-

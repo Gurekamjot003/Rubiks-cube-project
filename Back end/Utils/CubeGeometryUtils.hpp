@@ -2,6 +2,8 @@
 #include "../Cube/Cube.hpp"
 #include "../Cube Mechanics/Axis.hpp"
 #include "../Cube Mechanics/Direction.hpp"
+#include <string>
+#include <stdexcept>
 
 class CubeGeometryUtils{
     static set<char> view_rotation_moves;
