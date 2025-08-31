@@ -57,18 +57,24 @@ public:
     void set_color_by_face(FaceEnum face, Color color){
         colors[face] = color;
     }
-
-    void rotate_cubie(RotationMove& move);
 };
 
 class CubeGeometryUtils;
 class CubieRotator{
-    public: 
-    CubieRotator() = delete;
+    Cubie* cubie;
+public: 
+    CubieRotator(Cubie* cubie): cubie(cubie){}
 
-    static void rotate_cubie(Cubie* cubie, RotationMove& move);
+    
+    void rotate_cubie(RotationMove& move){
+        Axis axis = move.get_axis();
+        int num_rotations = move.get_times();
+
+        map<FaceEnum, Color> new_colors;
+        for(auto[face, color]: cubie->get_colors()){
+            FaceEnum new_face =  CubeGeometryUtils::get_next_face(axis, num_rotations, face);
+            new_colors[new_face] = color;
+        }
+        cubie->set_colors(new_colors);
+    }                                                                                                                                               
 };
-
-void Cubie::rotate_cubie(RotationMove& move){
-    CubieRotator::rotate_cubie(this, move);
-}

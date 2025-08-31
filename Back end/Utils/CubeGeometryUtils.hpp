@@ -164,15 +164,3 @@ map<Axis, vector<FaceEnum>> CubeGeometryUtils::next_face_mp = {
 };
 
 
-
-void CubieRotator::rotate_cubie(Cubie* cubie, RotationMove& move){
-    Axis axis = move.get_axis();
-    int num_rotations = move.get_times();
-
-    map<FaceEnum, Color> new_colors;
-    for(auto[face, color]: cubie->get_colors()){
-        FaceEnum new_face =  CubeGeometryUtils::get_next_face(axis, num_rotations, face);
-        new_colors[new_face] = color;
-    }
-    cubie->set_colors(new_colors);
-}

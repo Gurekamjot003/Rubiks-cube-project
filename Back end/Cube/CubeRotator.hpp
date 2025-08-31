@@ -59,7 +59,10 @@ public:
         vector<vector<Cubie*>> cubies_in_layer = cube->get_cubies_in_layer(axis, layer);
         RotationMove rotation_move(axis, num_rotations);
         for(auto& cubie_row: cubies_in_layer){
-            for(auto& cubie: cubie_row) cubie->rotate_cubie(rotation_move);
+            for(auto& cubie: cubie_row){
+                CubieRotator* cubie_rotator = new CubieRotator(cubie);
+                cubie_rotator->rotate_cubie(rotation_move);
+            }
         }
         
         //apply move
