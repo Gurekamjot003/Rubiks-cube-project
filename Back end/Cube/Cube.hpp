@@ -11,7 +11,6 @@ class CubeRotator;
 class Cube{
     
 private:
-    bool is_solved;
     vector<vector<vector<Cubie*>>> cubies; 
     CubeRotator* rotator;
     int n;
@@ -19,7 +18,6 @@ private:
     vector<Coordinate> corner_piece_coordinates;
 public:
     Cube(int n):n(n),rotator(nullptr){
-        is_solved = true;
         // Initialize cubies
         cubies.resize(n, vector<vector<Cubie*>>(n, vector<Cubie*>(n, nullptr)));
         for(int i=0; i<n; ++i){
@@ -128,13 +126,76 @@ public:
 
     bool is_cube_valid(){
         // color freq should be n*n 
+        map<set<Color>, int> corner_count, edge_count, middle_count;
+        for(auto& i: cubies){
+            for(auto& j: i){
+                for(auto& cubie: j){
+                    auto color_map = cubie->get_colors();
+                    bool has_white = false, has_yellow = false, has_red = false, has_green = false, has_blue = false, has_orange = false;
+                    set<Color> cur_colors;
+                    for(auto&[face, color]: color_map){
+                        if(cur_colors.count(color)) return false;
+                        if(color == Color::WHITE) has_white = true;
+                        else if(color == Color::YELLOW) has_yellow = true;
+                        else if(color == Color::RED) has_red = true;
+                        else if(color == Color::GREEN) has_green = true;
+                        else if(color == Color::BLUE) has_blue = true;
+                        else if(color == Color::ORANGE) has_orange = true;
+                        cur_colors.insert(color);
+                    }
 
-        // will apply these later
-        // edge pieces count should be correct
-        
+                    if((has_white && has_yellow) or (has_red && has_orange) or (has_green && has_blue)) return false;
+
+                    if(cubie->get_type() == CubieType::CORNER) corner_count[cur_colors]++;
+                    else if(cubie->get_type() == CubieType::EDGE) edge_count[cur_colors]++;
+                    else if(cubie->get_type() == CubieType::MIDDLE) middle_count[cur_colors]++;
+                }
+            }
+        }
 
         // corner pieces count should be correct
+        int req_corner_count = 1;
+        if(corner_count.size() != 8) return false;
+        for(auto&[st, freq]: corner_count){
+            if(freq != req_corner_count) return false;
+        }
+        
+        // edge pieces count should be correct
+        int req_edges_count = max(0, n-2);
+        if(edge_count.size() != 12) return false;
+        for(auto&[st, freq]: edge_count){
+            if(freq != req_edges_count) return false;
+        }
+
+        // check middle piece count
+        int req_middle_count = max(0, (n-2)*(n-2));
+        if(middle_count.size() != 6) return false;
+        for(auto&[st, freq]: middle_count){
+            if(freq != req_middle_count) return false;
+        }   
         return true;
+    }
+    
+    bool is_solved(){
+        map<FaceEnum, Color> face_color;
+        for(auto& i: cubies){
+            for(auto& j: i){
+                for(auto& cubie: j){
+                    auto color_map = cubie->get_colors();
+                    
+                    for(auto&[face, color]: color_map){
+                        if(face_color.count(face)){
+                            if(face_color[face] != color) return false;
+                        }
+                        else{
+                            face_color[face] = color;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+        
     }
 
 };

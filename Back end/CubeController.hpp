@@ -62,6 +62,13 @@ public:
         return camera->get_right_face();
     }
     
+    bool is_cube_solved(){
+        return cube->is_solved();
+    }
+
+    bool is_cube_valid(){
+        return cube->is_cube_valid();
+    }
 
     bool is_cube_solvable(){
         if(!cube->is_cube_valid()) return false;

@@ -5,16 +5,24 @@ int main(){
 
     c.display_cube();
 
+    cout<<(c.is_cube_solved()? "Solved": "Unsolved")<<endl;
+    cout<<(c.is_cube_valid()? "Valid": "Invalid")<<endl;
+    
     c.apply_move("x");
-
+    
     c.set_cubie_color(c.get_front_face(), 0, 0, Color::RED);
     c.display_cube();
+    cout<<(c.is_cube_valid()? "Valid": "Invalid")<<endl;
     c.set_cubie_color(c.get_front_face(), 1, 0, Color::RED);
     c.display_cube();
+    cout<<(c.is_cube_valid()? "Valid": "Invalid")<<endl;
     c.set_cubie_color(c.get_right_face(), 1, 0, Color::GREEN);
     c.display_cube();
+    cout<<(c.is_cube_valid()? "Valid": "Invalid")<<endl;
     c.set_cubie_color(c.get_up_face(), 1, 0, Color::YELLOW);
     c.display_cube();
+    cout<<(c.is_cube_solved()? "Solved": "Unsolved")<<endl;
+    cout<<(c.is_cube_valid()? "Valid": "Invalid")<<endl;
     while(true){
         cout<<"\n\nEnter a move: ";
         string move; 
