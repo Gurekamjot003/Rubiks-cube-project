@@ -79,11 +79,12 @@ public:
 
         return cube->get_corner_piece_coordinate_with_required_faces(axis, layer, faces_to_search);
     }
-
-    static void set_cubie_color_by_face(FaceEnum face, Camera* camera, Coordinate target, Cube* cube, Color color){
+    
+    static Coordinate get_abs_coordinate_for_target(FaceEnum face, Camera* camera, Coordinate target, Cube* cube){
         Coordinate top_left = get_top_left_coordinate_by_face_and_camera(face, camera, cube);
         Coordinate top_right = get_top_right_coordinate_by_face_and_camera(face, camera, cube);
-        CubeGeometryUtils::set_cubie_color_by_top_left_and_top_right(face, target, top_left, top_right, cube, color);
+        return CubeGeometryUtils::get_abs_coordinates_by_top_left_and_top_right(target, top_left, top_right, cube);
     }
+
 };
 

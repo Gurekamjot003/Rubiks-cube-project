@@ -2,6 +2,7 @@
 #include "Core/MoveParser.hpp"
 #include "Cube solving algorithms/CubeSolverFactory.hpp"
 #include "Cube Mechanics/CameraDisplayer.hpp"
+#include "Cube Mechanics/CubieColorSetter.hpp"
 
 
 class CubeController{
@@ -45,7 +46,8 @@ public:
 
     void set_cubie_color(FaceEnum face, int i, int j, Color color){
         Coordinate target(i,j);
-        CameraUtils::set_cubie_color_by_face(face, camera, target, cube, color);
+        CubieColorSetter* setter = new CubieColorSetter(camera, cube); 
+        setter->set_color(face, target, color);
     }
 
     FaceEnum get_front_face(){

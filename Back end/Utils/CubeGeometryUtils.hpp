@@ -136,13 +136,6 @@ public:
 
         return cube->get_cubies_in_layer(axis, layer, top_left, top_right);
     }
-
-    static void set_cubie_color_by_top_left_and_top_right(FaceEnum face, Coordinate target, Coordinate top_left, Coordinate top_right, Cube* cube, Color color){        
-        Axis axis = get_axis_from_face(face);
-        int layer = get_layer_from_face(face, cube);
-        Coordinate abs_target = get_abs_coordinates_by_top_left_and_top_right(target, top_left, top_right, cube);
-        cube->set_color_by_abs_coordinates(face, axis, layer, abs_target, color);
-    }
 };
 
 vector<char> rotation_moves_arr = {'x', 'y', 'z'};
