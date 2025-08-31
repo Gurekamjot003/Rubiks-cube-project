@@ -49,11 +49,17 @@ public:
         else if(axis == Axis::Z) swap(cubies[r_from][c_from][layer], cubies[r_to][c_to][layer]);
     }
 
-    Cubie* get_cubie(Coordinate coordinate, FaceEnum face);
-        
-    void set_color(FaceEnum face, Coordinate coordinate, Color color){
-        Cubie* target_cubie = get_cubie(coordinate, face);
+    Cubie* get_cubie(Axis axis, int layer, Coordinate coordinate){
+        int i = coordinate.get_x(), j = coordinate.get_y();
 
+        if(axis == Axis::X) return cubies[layer][i][j];
+        else if(axis == Axis::Y) return cubies[i][layer][j];
+        else if(axis == Axis::Z) return cubies[i][j][layer];
+        return nullptr; // Should not happen
+    }
+        
+    void set_color_by_abs_coordinates(FaceEnum face, Axis axis, int layer, Coordinate coordinate, Color color){
+        Cubie* target_cubie = get_cubie(axis, layer, coordinate);
         target_cubie->set_color_by_face(face, color);
     }
 

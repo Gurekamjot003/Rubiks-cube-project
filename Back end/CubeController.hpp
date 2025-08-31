@@ -28,7 +28,7 @@ public:
     }
 
 
-    void apply_move(string& move){
+    void apply_move(string move){
         vector<ICommand*> commands = MoveParser::parse(move, camera, cube);
         for(auto& command: commands){
             command->execute(cube, camera);
@@ -39,11 +39,27 @@ public:
         cube->scramble_cube();
     }
 
-
     void display_cube(){
-        
         displayer->display(cube);
     }
+
+    void set_cubie_color(FaceEnum face, int i, int j, Color color){
+        Coordinate target(i,j);
+        CameraUtils::set_cubie_color_by_face(face, camera, target, cube, color);
+    }
+
+    FaceEnum get_front_face(){
+        return camera->get_front_face();
+    }
+
+    FaceEnum get_up_face(){
+        return camera->get_up_face();
+    }
+    
+    FaceEnum get_right_face(){
+        return camera->get_right_face();
+    }
+    
 
     bool is_cube_solvable(){
         if(!cube->is_cube_valid()) return false;
