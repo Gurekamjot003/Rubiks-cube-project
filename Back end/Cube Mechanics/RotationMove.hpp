@@ -8,10 +8,10 @@ class RotationMove{
 public:
     RotationMove(Axis axis, int times): axis(axis),times(times){}
 
-    Axis get_axis(){
+    const Axis get_axis() &{
         return axis;
     }
-    int get_times(){
+    const int get_times() &{
         return times;
     }
 };

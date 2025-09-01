@@ -127,7 +127,7 @@ public:
         return Coordinate();
     }
     
-    int get_size(){
+    const int get_size() &{
         return n;
     }
 

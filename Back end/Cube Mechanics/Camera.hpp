@@ -15,15 +15,15 @@ public:
         right_face = FaceEnum::RIGHT;
     }
 
-    FaceEnum get_front_face(){
+    const FaceEnum get_front_face() &{
         return front_face;
     }
 
-    FaceEnum get_up_face(){
+    const FaceEnum get_up_face() &{
         return up_face;
     }
 
-    FaceEnum get_right_face(){
+    const FaceEnum get_right_face() &{
         return right_face;
     }
 

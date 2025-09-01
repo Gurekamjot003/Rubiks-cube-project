@@ -50,15 +50,15 @@ public:
         setter->set_color(face, target, color);
     }
 
-    FaceEnum get_front_face(){
+    const FaceEnum get_front_face() &{
         return camera->get_front_face();
     }
 
-    FaceEnum get_up_face(){
+    const FaceEnum get_up_face() &{
         return camera->get_up_face();
     }
     
-    FaceEnum get_right_face(){
+    const FaceEnum get_right_face() &{
         return camera->get_right_face();
     }
     

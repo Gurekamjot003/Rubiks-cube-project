@@ -16,15 +16,15 @@ public:
         this->times = times;
     }
 
-    Axis get_axis(){
+    const Axis get_axis() &{
         return axis;
     }
 
-    int get_layer(){
+    const int get_layer() &{
         return layer;
     }
 
-    int get_times(){
+    const int get_times() &{
         return times;
     }
 };

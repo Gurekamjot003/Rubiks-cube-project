@@ -29,7 +29,7 @@ public:
         else type = CubieType::EMPTY;
     }
 
-    map<FaceEnum, Color> get_colors(){
+    const map<FaceEnum, Color> get_colors() &{
         return colors;
     }
 
@@ -37,11 +37,11 @@ public:
         colors = new_colors;
     }
 
-    CubieType get_type(){
+    const CubieType get_type() &{
         return type;
     }
 
-    Color get_color_from_face(FaceEnum face){
+    const Color get_color_from_face(FaceEnum face) &{
         if(colors.find(face) == colors.end()) return Color::EMPTY;
         return colors[face];
     }
