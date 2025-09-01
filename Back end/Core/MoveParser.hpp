@@ -29,7 +29,7 @@ class MoveParser{
                 layer_diff = layer_diff*10 + token[0] - '0';
                 token.erase(token.begin());
             }
-            layer_diff -= 1;
+            if(layer_diff) layer_diff -= 1;
             FaceEnum rotating_face = CameraUtils::get_face_enum_from_move(tolower(token[0]), camera);
             Axis axis = CubeGeometryUtils::get_axis_from_face(rotating_face);
             int layer = CubeGeometryUtils::get_layer_from_face(rotating_face, cube);
