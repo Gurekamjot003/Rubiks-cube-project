@@ -3,7 +3,7 @@ using namespace std;
 
 int main(){
     cout<<"\n\nWelcome to Gurekamjot's Rubik's Cube Solver! \n\n";
-    cout<<"Currently it is just a player ans a work in progress\n";
+    cout<<"Currently it is just a player and a work in progress\n";
     cout<<"You can apply various moves on the cube all the moves are listed below \n\n";
     cout<<"Normal moves - R L F B U D M E S\n";
     cout<<"Rotation moves - x y z\n";
