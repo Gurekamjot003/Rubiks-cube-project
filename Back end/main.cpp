@@ -29,5 +29,9 @@ int main(){
         
         c.display_cube();
     }
+
+    cout<<"\n\nThanks for using Rubik's Cube Player.\n\n";
+    cout<<"Next up: Building the 3D visualizer with Three.js and implementing the solver.\n";
+    cout<<"Follow for updates!\n\n";
     
 }
