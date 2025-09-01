@@ -14,9 +14,10 @@ class MoveParser{
     class ViewRotateParser{
     public:
         static std::unique_ptr<ICommand> parse_token(std::string& token, Camera* camera, Cube* cube){
-            Axis axis = CubeGeometryUtils::get_axis_from_rotation_move(token[0]);
+            FaceEnum rotating_face = CameraUtils::get_face_enum_from_rotation_move(token[0], camera);
+            Axis axis = CubeGeometryUtils::get_axis_from_face(rotating_face);
             Direction direction = CubeGeometryUtils::get_direction_from_move(token.back());
-            int num_rotations = CameraUtils::get_num_rotations(direction);
+            int num_rotations = CameraUtils::get_num_rotations(direction, rotating_face);
             return std::make_unique<ViewRotateCommand>(axis, num_rotations);
         }
     };

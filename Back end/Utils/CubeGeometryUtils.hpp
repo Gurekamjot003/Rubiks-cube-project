@@ -67,14 +67,6 @@ public:
         return false;
     }
 
-    static Axis get_axis_from_rotation_move(char c){
-        if(!is_view_rotate_move(c)) throw std::runtime_error("character is not a valid rotation move");
-        if(c == 'x') return Axis::X;
-        if(c == 'y') return Axis::Y;
-        if(c == 'z') return Axis::Z;
-        return Axis::X;
-    }
-
     static Direction get_direction_from_move(char c){
         if(c == '\'') return Direction::ANTI_CLOCKWISE;
         if(c == '2') return Direction::DOUBLE_ROTATION;

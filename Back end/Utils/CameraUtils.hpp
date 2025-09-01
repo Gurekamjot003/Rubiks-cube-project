@@ -14,8 +14,15 @@ public:
         return FaceEnum::FRONT;
     }
 
-    static int get_num_rotations(Direction direction){
-        int num_rotations = CubeGeometryUtils::get_relative_num_rotations(direction);
+    static FaceEnum get_face_enum_from_rotation_move(char move, Camera* camera){
+        if(move == 'x') return camera->get_right_face();
+        if(move == 'y') return camera->get_up_face();
+        if(move == 'z') return camera->get_front_face();
+        return FaceEnum::FRONT;
+    }
+
+    static int get_num_rotations(Direction direction, FaceEnum face){
+        int num_rotations = CubeGeometryUtils::get_num_rotations(direction, face);
         // camera will rotate opposite to cube
         return 4-num_rotations;
     }
