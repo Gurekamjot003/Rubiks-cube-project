@@ -25,10 +25,11 @@ class MoveParser{
     public:     
         static std::unique_ptr<ICommand> parse_token(std::string& token, Camera* camera, Cube* cube){
             int layer_diff = 0;
-            if(isdigit(token[0])){
-                layer_diff = token[0] - '0' - 1;
+            while(isdigit(token[0])){
+                layer_diff = layer_diff*10 + token[0] - '0';
                 token.erase(token.begin());
             }
+            layer_diff -= 1;
             FaceEnum rotating_face = CameraUtils::get_face_enum_from_move(tolower(token[0]), camera);
             Axis axis = CubeGeometryUtils::get_axis_from_face(rotating_face);
             int layer = CubeGeometryUtils::get_layer_from_face(rotating_face, cube);
@@ -45,8 +46,8 @@ class MoveParser{
         static std::unique_ptr<ICommand> parse_token(std::string& token, Camera* camera, Cube* cube){
             int num_layers = 1;
             if(cube->get_size()>2) num_layers = 2;
-            if(isdigit(token[0])){
-                num_layers = token[0] - '0';
+            while(isdigit(token[0])){
+                num_layers = num_layers*10 + token[0] - '0';
                 token.erase(token.begin());
             }
             FaceEnum rotating_face = CameraUtils::get_face_enum_from_move(tolower(token[0]), camera);
