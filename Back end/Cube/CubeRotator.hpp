@@ -56,11 +56,11 @@ public:
         int num_rotations = move.get_times();
 
         // cubies internal move
-        vector<vector<Cubie*>> cubies_in_layer = cube->get_cubies_in_layer(axis, layer);
+        std::vector<std::vector<Cubie*>> cubies_in_layer = cube->get_cubies_in_layer(axis, layer);
         RotationMove rotation_move(axis, num_rotations);
         for(auto& cubie_row: cubies_in_layer){
             for(auto& cubie: cubie_row){
-                unique_ptr<CubieRotator> cubie_rotator = make_unique<CubieRotator>(cubie);
+                std::unique_ptr<CubieRotator> cubie_rotator = std::make_unique<CubieRotator>(cubie);
                 cubie_rotator->rotate_cubie(rotation_move);
             }
         }

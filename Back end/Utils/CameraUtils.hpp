@@ -24,7 +24,7 @@ public:
         Axis axis = CubeGeometryUtils::get_axis_from_face(required_face);
         int layer = CubeGeometryUtils::get_layer_from_face(required_face, cube);
 
-        vector<FaceEnum> faces_to_search;
+        std::vector<FaceEnum> faces_to_search;
         if(required_face == camera->get_up_face()){
             faces_to_search = {
                 camera->get_up_face(),
@@ -54,7 +54,7 @@ public:
         Axis axis = CubeGeometryUtils::get_axis_from_face(required_face);
         int layer = CubeGeometryUtils::get_layer_from_face(required_face, cube);
 
-        vector<FaceEnum> faces_to_search;
+        std::vector<FaceEnum> faces_to_search;
         if(required_face == camera->get_up_face()){
             faces_to_search = {
                 camera->get_up_face(),

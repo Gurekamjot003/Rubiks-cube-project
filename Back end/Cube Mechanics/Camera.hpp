@@ -39,7 +39,7 @@ public:
         right_face = face;
     }
 
-    vector<FaceEnum> get_orientation(){
+    std::vector<FaceEnum> get_orientation(){
         return {front_face, right_face, up_face};
     }
 };

@@ -6,14 +6,13 @@
 #include "../Cube Mechanics/RotationMove.hpp"
 #include <map>
 #include <vector>
-using namespace std;
 
 
 class Move;
 class CubieRotator;
 class Cubie{
 private:
-    map<FaceEnum, Color> colors;
+    std::map<FaceEnum, Color> colors;
     CubieType type;
     
 public:
@@ -21,7 +20,7 @@ public:
         colors[face] = c;
     }
 
-    Cubie(map<FaceEnum, Color> colors){
+    Cubie(std::map<FaceEnum, Color> colors){
         this->colors = colors;
         if(colors.size() == 3) type = CubieType::CORNER;
         else if(colors.size() == 2) type = CubieType::EDGE;
@@ -29,11 +28,11 @@ public:
         else type = CubieType::EMPTY;
     }
 
-    const map<FaceEnum, Color> get_colors() &{
+    const std::map<FaceEnum, Color> get_colors() &{
         return colors;
     }
 
-    void set_colors(map<FaceEnum, Color> new_colors){
+    void set_colors(std::map<FaceEnum, Color> new_colors){
         colors = new_colors;
     }
 
@@ -46,7 +45,7 @@ public:
         return colors[face];
     }
 
-    bool check_faces_present(vector<FaceEnum> faces){
+    bool check_faces_present(std::vector<FaceEnum> faces){
         if(faces.size() != colors.size()) return false;
         for(auto& face: faces){
             if(colors.find(face) == colors.end()) return false;

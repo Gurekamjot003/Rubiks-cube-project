@@ -13,10 +13,10 @@ class CubeRotator;
 class Cube{
     
 private:
-    vector<vector<vector<unique_ptr<Cubie>>>> cubies; 
+    std::vector<std::vector<std::vector<std::unique_ptr<Cubie>>>> cubies; 
     int n;
 
-    vector<Coordinate> corner_piece_coordinates;
+    std::vector<Coordinate> corner_piece_coordinates;
 public:
     Cube(int n):n(n){
         // Initialize cubies
@@ -30,14 +30,14 @@ public:
         for(int i=0; i<n; ++i){
             for(int j=0; j<n; ++j){
                 for(int k=0; k<n; ++k){
-                    map<FaceEnum, Color> cubie_colors;
+                    std::map<FaceEnum, Color> cubie_colors;
                     if(i == 0) cubie_colors[FaceEnum::LEFT] = Color::ORANGE;
                     if(i == n-1) cubie_colors[FaceEnum::RIGHT] = Color::RED;
                     if(j == 0) cubie_colors[FaceEnum::DOWN] = Color::YELLOW;
                     if(j == n-1) cubie_colors[FaceEnum::UP] = Color::WHITE;
                     if(k == 0) cubie_colors[FaceEnum::BACK] = Color::BLUE;
                     if(k == n-1) cubie_colors[FaceEnum::FRONT] = Color::GREEN;
-                    cubies[i][j][k] = make_unique<Cubie>(cubie_colors);
+                    cubies[i][j][k] = std::make_unique<Cubie>(cubie_colors);
                 }
             }
         }
@@ -72,7 +72,7 @@ public:
         //scramble cube
     }
 
-    vector<vector<Cubie*>> get_cubies_in_layer(Axis axis, int layer, Coordinate top_left = Coordinate(0, 0), Coordinate top_right = Coordinate(0, 1)){
+    std::vector<std::vector<Cubie*>> get_cubies_in_layer(Axis axis, int layer, Coordinate top_left = Coordinate(0, 0), Coordinate top_right = Coordinate(0, 1)){
         int di = 1, end_i = n;
         int dj = 1, end_j = n;
         int start_i = top_left.get_x(), start_j = top_left.get_y();
@@ -85,10 +85,10 @@ public:
             dj = -1;
         }
         
-        vector<vector<Cubie*>> cubies_in_layer;
+        std::vector<std::vector<Cubie*>> cubies_in_layer;
         if(top_left.get_x() == top_right.get_x()){ // loop x befor y
             for(int i = start_i; i != end_i; i+=di){
-                vector<Cubie*> cur_row;
+                std::vector<Cubie*> cur_row;
                 for(int j = start_j; j!=end_j; j+=dj){
                     if(axis == Axis::X) cur_row.push_back(cubies[layer][i][j].get());
                     else if(axis == Axis::Y) cur_row.push_back(cubies[i][layer][j].get());
@@ -99,7 +99,7 @@ public:
         }
         else{ // loop y before x
             for(int j = start_j; j!=end_j; j+=dj){
-                vector<Cubie*> cur_row;
+                std::vector<Cubie*> cur_row;
                 for(int i = start_i; i != end_i; i+=di){
                     if(axis == Axis::X) cur_row.push_back(cubies[layer][i][j].get());
                     else if(axis == Axis::Y) cur_row.push_back(cubies[i][layer][j].get());
@@ -112,7 +112,7 @@ public:
         return cubies_in_layer;
     }
 
-    Coordinate get_corner_piece_coordinate_with_required_faces(Axis axis, int layer, vector<FaceEnum> required_faces){
+    Coordinate get_corner_piece_coordinate_with_required_faces(Axis axis, int layer, std::vector<FaceEnum> required_faces){
 
         for(auto&coor: corner_piece_coordinates){
             int i = coor.get_x();
@@ -133,13 +133,13 @@ public:
 
     bool is_cube_valid(){
         // color freq should be n*n 
-        map<set<Color>, int> corner_count, edge_count, middle_count;
+        std::map<std::set<Color>, int> corner_count, edge_count, middle_count;
         for(auto& i: cubies){
             for(auto& j: i){
                 for(auto& cubie: j){
                     auto color_map = cubie->get_colors();
                     bool has_white = false, has_yellow = false, has_red = false, has_green = false, has_blue = false, has_orange = false;
-                    set<Color> cur_colors;
+                    std::set<Color> cur_colors;
                     for(auto&[face, color]: color_map){
                         if(cur_colors.count(color)) return false;
                         if(color == Color::WHITE) has_white = true;
@@ -168,14 +168,14 @@ public:
         }
         
         // edge pieces count should be correct
-        int req_edges_count = max(0, n-2);
+        int req_edges_count = std::max(0, n-2);
         if(edge_count.size() != 12) return false;
         for(auto&[st, freq]: edge_count){
             if(freq != req_edges_count) return false;
         }
 
         // check middle piece count
-        int req_middle_count = max(0, (n-2)*(n-2));
+        int req_middle_count = std::max(0, (n-2)*(n-2));
         if(middle_count.size() != 6) return false;
         for(auto&[st, freq]: middle_count){
             if(freq != req_middle_count) return false;
@@ -184,7 +184,7 @@ public:
     }
     
     bool is_solved(){
-        map<FaceEnum, Color> face_color;
+        std::map<FaceEnum, Color> face_color;
         for(auto& i: cubies){
             for(auto& j: i){
                 for(auto& cubie: j){

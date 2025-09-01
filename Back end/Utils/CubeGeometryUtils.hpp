@@ -6,8 +6,8 @@
 #include <stdexcept>
 
 class CubeGeometryUtils{
-    static set<char> view_rotation_moves;
-    static map<Axis, vector<FaceEnum>> next_face_mp;
+    static std::set<char> view_rotation_moves;
+    static std::map<Axis, std::vector<FaceEnum>> next_face_mp;
 public:
     static Axis get_axis_from_face(FaceEnum face){
         if(face == FaceEnum::BACK or face == FaceEnum::FRONT){
@@ -60,7 +60,7 @@ public:
         return view_rotation_moves.count(c);
     }
 
-    static bool is_wide_move(string& move){
+    static bool is_wide_move(std::string& move){
         for(auto& ch: move){
             if(islower(ch) or ch == 'w') return true;
         }
@@ -68,7 +68,7 @@ public:
     }
 
     static Axis get_axis_from_rotation_move(char c){
-        if(!is_view_rotate_move(c)) throw runtime_error("character is not a valid rotation move");
+        if(!is_view_rotate_move(c)) throw std::runtime_error("character is not a valid rotation move");
         if(c == 'x') return Axis::X;
         if(c == 'y') return Axis::Y;
         if(c == 'z') return Axis::Z;
@@ -132,7 +132,7 @@ public:
         return next_faces[new_idx];
     }
 
-    static vector<vector<Cubie*>> get_cubies_by_face(FaceEnum face, Cube* cube, Coordinate top_left = Coordinate(0,0), Coordinate top_right = Coordinate(0, 1)){
+    static std::vector<std::vector<Cubie*>> get_cubies_by_face(FaceEnum face, Cube* cube, Coordinate top_left = Coordinate(0,0), Coordinate top_right = Coordinate(0, 1)){
         Axis axis = CubeGeometryUtils::get_axis_from_face(face);
         int layer = CubeGeometryUtils::get_layer_from_face(face, cube);
 
@@ -140,9 +140,9 @@ public:
     }
 };
 
-vector<char> rotation_moves_arr = {'x', 'y', 'z'};
-set<char> CubeGeometryUtils::view_rotation_moves = set<char>(rotation_moves_arr.begin(), rotation_moves_arr.end());
-map<Axis, vector<FaceEnum>> CubeGeometryUtils::next_face_mp = {
+std::vector<char> rotation_moves_arr = {'x', 'y', 'z'};
+std::set<char> CubeGeometryUtils::view_rotation_moves = std::set<char>(rotation_moves_arr.begin(), rotation_moves_arr.end());
+std::map<Axis, std::vector<FaceEnum>> CubeGeometryUtils::next_face_mp = {
     {Axis::X, {
         FaceEnum::UP,
         FaceEnum::BACK,
@@ -168,7 +168,7 @@ void CubieRotator::rotate_cubie(RotationMove& move){
     Axis axis = move.get_axis();
     int num_rotations = move.get_times();
 
-    map<FaceEnum, Color> new_colors;
+    std::map<FaceEnum, Color> new_colors;
     for(auto[face, color]: cubie->get_colors()){
         FaceEnum new_face =  CubeGeometryUtils::get_next_face(axis, num_rotations, face);
         new_colors[new_face] = color;

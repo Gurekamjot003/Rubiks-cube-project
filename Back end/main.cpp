@@ -1,4 +1,5 @@
 #include "CubeController.hpp"
+using namespace std;
 
 int main(){
     CubeController c(3);

@@ -13,17 +13,17 @@ class MoveParser{
 
     class ViewRotateParser{
     public:
-        static unique_ptr<ICommand> parse_token(string& token, Camera* camera, Cube* cube){
+        static std::unique_ptr<ICommand> parse_token(std::string& token, Camera* camera, Cube* cube){
             Axis axis = CubeGeometryUtils::get_axis_from_rotation_move(token[0]);
             Direction direction = CubeGeometryUtils::get_direction_from_move(token.back());
             int num_rotations = CameraUtils::get_num_rotations(direction);
-            return make_unique<ViewRotateCommand>(axis, num_rotations);
+            return std::make_unique<ViewRotateCommand>(axis, num_rotations);
         }
     };
 
     class FaceTurnParser{
     public:     
-        static unique_ptr<ICommand> parse_token(string& token, Camera* camera, Cube* cube){
+        static std::unique_ptr<ICommand> parse_token(std::string& token, Camera* camera, Cube* cube){
             int layer_diff = 0;
             if(isdigit(token[0])){
                 layer_diff = token[0] - '0' - 1;
@@ -36,13 +36,13 @@ class MoveParser{
             Direction direction = CubeGeometryUtils::get_direction_from_move(token.back());
             int num_rotations = CubeGeometryUtils::get_num_rotations(direction, rotating_face);
 
-            return make_unique<FaceTurnCommand>(axis, layer, num_rotations);
+            return std::make_unique<FaceTurnCommand>(axis, layer, num_rotations);
         }
     };
 
     class WideFaceTurnParser{
     public:     
-        static unique_ptr<ICommand> parse_token(string& token, Camera* camera, Cube* cube){
+        static std::unique_ptr<ICommand> parse_token(std::string& token, Camera* camera, Cube* cube){
             int num_layers = 1;
             if(cube->get_size()>2) num_layers = 2;
             if(isdigit(token[0])){
@@ -55,29 +55,29 @@ class MoveParser{
             Direction direction = CubeGeometryUtils::get_direction_from_move(token.back());
             int num_rotations = CubeGeometryUtils::get_num_rotations(direction, rotating_face);
 
-            return make_unique<WideFaceTurnCommand>(axis, layer, num_rotations, num_layers);
+            return std::make_unique<WideFaceTurnCommand>(axis, layer, num_rotations, num_layers);
         }
     };
 
     class TokenStandardizer{
     public:
-        static void standardize(string& token, Cube* cube){
+        static void standardize(std::string& token, Cube* cube){
             bool is_even_cube = (cube->get_size() % 2 == 0);
             int mid_layer_int = cube->get_size()/2 + 1;
-            string ans;
+            std::string ans;
             
-            string mid_layer = to_string(mid_layer_int);
+            std::string mid_layer = std::to_string(mid_layer_int);
             for(auto& ch: token){
                 if(tolower(ch) == 'm'){
-                    if(is_even_cube) throw invalid_argument("invalid move - even cubes don't have this move");
+                    if(is_even_cube) throw std::invalid_argument("invalid move - even cubes don't have this move");
                     ans += mid_layer + "L";
                 }
                 else if(tolower(ch) == 'e'){
-                    if(is_even_cube) throw invalid_argument("invalid move - even cubes don't have this move");
+                    if(is_even_cube) throw std::invalid_argument("invalid move - even cubes don't have this move");
                     ans += mid_layer+"D";
                 }
                 else if(tolower(ch) == 's'){
-                    if(is_even_cube) throw invalid_argument("invalid move - even cubes don't have this move");
+                    if(is_even_cube) throw std::invalid_argument("invalid move - even cubes don't have this move");
                     ans += mid_layer+"F";
                 }
                 else ans.push_back(ch);
@@ -88,10 +88,10 @@ class MoveParser{
 
 public:
 
-    static vector<unique_ptr<ICommand>> parse(string& move, Camera* camera, Cube* cube){
-        string token = "";
+    static std::vector<std::unique_ptr<ICommand>> parse(std::string& move, Camera* camera, Cube* cube){
+        std::string token = "";
         move.push_back(' ');
-        vector<unique_ptr<ICommand>> commands;
+        std::vector<std::unique_ptr<ICommand>> commands;
         for(auto& ch: move){
             if(isspace(ch) && !token.empty()){
                 commands.push_back(parse_token(token, camera, cube));
@@ -103,7 +103,7 @@ public:
         return commands;
     }
 
-    static unique_ptr<ICommand> parse_token(string& token, Camera* camera, Cube* cube){
+    static std::unique_ptr<ICommand> parse_token(std::string& token, Camera* camera, Cube* cube){
 
         TokenStandardizer::standardize(token, cube);
         
