@@ -44,7 +44,8 @@ public:
         displayer->display(cube.get());
     }
 
-    void set_cubie_color(FaceEnum face, int i, int j, Color color){
+    void set_cubie_color(FaceEnum face, int i, int j, Color color){ 
+        // top left of current face is assumed to be 0, 0
         Coordinate target(i,j);
         std::unique_ptr<CubieColorSetter> setter = std::make_unique<CubieColorSetter>(camera.get(), cube.get()); 
         setter->set_color(face, target, color);
