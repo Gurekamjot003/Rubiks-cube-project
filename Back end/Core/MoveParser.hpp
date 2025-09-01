@@ -13,17 +13,17 @@ class MoveParser{
 
     class ViewRotateParser{
     public:
-        static ICommand* parse_token(string& token, Camera* camera, Cube* cube){
+        static unique_ptr<ICommand> parse_token(string& token, Camera* camera, Cube* cube){
             Axis axis = CubeGeometryUtils::get_axis_from_rotation_move(token[0]);
             Direction direction = CubeGeometryUtils::get_direction_from_move(token.back());
             int num_rotations = CameraUtils::get_num_rotations(direction);
-            return new ViewRotateCommand(axis, num_rotations);
+            return make_unique<ViewRotateCommand>(axis, num_rotations);
         }
     };
 
     class FaceTurnParser{
     public:     
-        static ICommand* parse_token(string& token, Camera* camera, Cube* cube){
+        static unique_ptr<ICommand> parse_token(string& token, Camera* camera, Cube* cube){
             int layer_diff = 0;
             if(isdigit(token[0])){
                 layer_diff = token[0] - '0' - 1;
@@ -36,13 +36,13 @@ class MoveParser{
             Direction direction = CubeGeometryUtils::get_direction_from_move(token.back());
             int num_rotations = CubeGeometryUtils::get_num_rotations(direction, rotating_face);
 
-            return new FaceTurnCommand(axis, layer, num_rotations);
+            return make_unique<FaceTurnCommand>(axis, layer, num_rotations);
         }
     };
 
     class WideFaceTurnParser{
     public:     
-        static ICommand* parse_token(string& token, Camera* camera, Cube* cube){
+        static unique_ptr<ICommand> parse_token(string& token, Camera* camera, Cube* cube){
             int num_layers = 1;
             if(cube->get_size()>2) num_layers = 2;
             if(isdigit(token[0])){
@@ -55,7 +55,7 @@ class MoveParser{
             Direction direction = CubeGeometryUtils::get_direction_from_move(token.back());
             int num_rotations = CubeGeometryUtils::get_num_rotations(direction, rotating_face);
 
-            return new WideFaceTurnCommand(axis, layer, num_rotations, num_layers);
+            return make_unique<WideFaceTurnCommand>(axis, layer, num_rotations, num_layers);
         }
     };
 
@@ -88,14 +88,13 @@ class MoveParser{
 
 public:
 
-    static vector<ICommand*> parse(string& move, Camera* camera, Cube* cube){
+    static vector<unique_ptr<ICommand>> parse(string& move, Camera* camera, Cube* cube){
         string token = "";
         move.push_back(' ');
-        vector<ICommand*> commands;
+        vector<unique_ptr<ICommand>> commands;
         for(auto& ch: move){
             if(isspace(ch) && !token.empty()){
-                ICommand* cur_command = parse_token(token, camera, cube);
-                commands.push_back(cur_command);
+                commands.push_back(parse_token(token, camera, cube));
                 token = "";
             }
             else token.push_back(ch);
@@ -104,7 +103,7 @@ public:
         return commands;
     }
 
-    static ICommand* parse_token(string& token, Camera* camera, Cube* cube){
+    static unique_ptr<ICommand> parse_token(string& token, Camera* camera, Cube* cube){
 
         TokenStandardizer::standardize(token, cube);
         

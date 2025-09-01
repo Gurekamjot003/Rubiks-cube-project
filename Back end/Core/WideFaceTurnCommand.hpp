@@ -18,7 +18,7 @@ public:
             moves.push_back(move);
             layer+=d;
         }
-        CubeRotator* rotator = new CubeRotator(cube);
+        unique_ptr<CubeRotator> rotator = make_unique<CubeRotator>(cube);
         for(auto& move: moves){
             rotator->rotate_cube(move);
         }

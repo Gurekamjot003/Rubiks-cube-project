@@ -7,7 +7,6 @@
 class CameraRotator;
 class Camera{
     FaceEnum front_face, up_face, right_face;
-    CameraRotator* camera_rotator;
     
 public:
     Camera(){

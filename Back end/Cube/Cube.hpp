@@ -5,6 +5,7 @@
 #include "../Cube Mechanics/RotationMove.hpp"
 #include "Coordinate.hpp"
 #include <set>
+#include <memory>
 
 
 class CubeRotator;
@@ -12,15 +13,20 @@ class CubeRotator;
 class Cube{
     
 private:
-    vector<vector<vector<Cubie*>>> cubies; 
-    CubeRotator* rotator;
+    vector<vector<vector<unique_ptr<Cubie>>>> cubies; 
     int n;
 
     vector<Coordinate> corner_piece_coordinates;
 public:
-    Cube(int n):n(n),rotator(nullptr){
+    Cube(int n):n(n){
         // Initialize cubies
-        cubies.resize(n, vector<vector<Cubie*>>(n, vector<Cubie*>(n, nullptr)));
+        cubies.resize(n);
+        for(int i = 0; i<n; i++){
+            cubies[i].resize(n);
+            for(int j = 0; j<n; j++){
+                cubies[i][j].resize(n);
+            }
+        }
         for(int i=0; i<n; ++i){
             for(int j=0; j<n; ++j){
                 for(int k=0; k<n; ++k){
@@ -31,7 +37,7 @@ public:
                     if(j == n-1) cubie_colors[FaceEnum::UP] = Color::WHITE;
                     if(k == 0) cubie_colors[FaceEnum::BACK] = Color::BLUE;
                     if(k == n-1) cubie_colors[FaceEnum::FRONT] = Color::GREEN;
-                    cubies[i][j][k] = new Cubie(cubie_colors);
+                    cubies[i][j][k] = make_unique<Cubie>(cubie_colors);
                 }
             }
         }
@@ -51,9 +57,9 @@ public:
     Cubie* get_cubie(Axis axis, int layer, Coordinate coordinate){
         int i = coordinate.get_x(), j = coordinate.get_y();
 
-        if(axis == Axis::X) return cubies[layer][i][j];
-        else if(axis == Axis::Y) return cubies[i][layer][j];
-        else if(axis == Axis::Z) return cubies[i][j][layer];
+        if(axis == Axis::X) return cubies[layer][i][j].get();
+        else if(axis == Axis::Y) return cubies[i][layer][j].get();
+        else if(axis == Axis::Z) return cubies[i][j][layer].get();
         return nullptr; // Should not happen
     }
         
@@ -84,9 +90,9 @@ public:
             for(int i = start_i; i != end_i; i+=di){
                 vector<Cubie*> cur_row;
                 for(int j = start_j; j!=end_j; j+=dj){
-                    if(axis == Axis::X) cur_row.push_back(cubies[layer][i][j]);
-                    else if(axis == Axis::Y) cur_row.push_back(cubies[i][layer][j]);
-                    else if(axis == Axis::Z) cur_row.push_back(cubies[i][j][layer]);
+                    if(axis == Axis::X) cur_row.push_back(cubies[layer][i][j].get());
+                    else if(axis == Axis::Y) cur_row.push_back(cubies[i][layer][j].get());
+                    else if(axis == Axis::Z) cur_row.push_back(cubies[i][j][layer].get());
                 }
                 cubies_in_layer.push_back(cur_row);
             }
@@ -95,9 +101,9 @@ public:
             for(int j = start_j; j!=end_j; j+=dj){
                 vector<Cubie*> cur_row;
                 for(int i = start_i; i != end_i; i+=di){
-                    if(axis == Axis::X) cur_row.push_back(cubies[layer][i][j]);
-                    else if(axis == Axis::Y) cur_row.push_back(cubies[i][layer][j]);
-                    else if(axis == Axis::Z) cur_row.push_back(cubies[i][j][layer]);
+                    if(axis == Axis::X) cur_row.push_back(cubies[layer][i][j].get());
+                    else if(axis == Axis::Y) cur_row.push_back(cubies[i][layer][j].get());
+                    else if(axis == Axis::Z) cur_row.push_back(cubies[i][j][layer].get());
                 }
                 cubies_in_layer.push_back(cur_row);
             }   
@@ -112,9 +118,9 @@ public:
             int i = coor.get_x();
             int j = coor.get_y();
             Cubie* cubie_to_search;
-            if(axis == Axis::X) cubie_to_search = cubies[layer][i][j];
-            else if(axis == Axis::Y) cubie_to_search = cubies[i][layer][j];
-            else if(axis == Axis::Z) cubie_to_search = cubies[i][j][layer];
+            if(axis == Axis::X) cubie_to_search = cubies[layer][i][j].get();
+            else if(axis == Axis::Y) cubie_to_search = cubies[i][layer][j].get();
+            else if(axis == Axis::Z) cubie_to_search = cubies[i][j][layer].get();
 
             if(cubie_to_search->check_faces_present(required_faces)) return coor;
         }

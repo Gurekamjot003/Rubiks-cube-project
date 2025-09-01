@@ -7,14 +7,14 @@
 
 class CubeSolverFactory{
 public:
-    static CubeSolver* get_solver(SolverType type, Cube* cube){
+    static unique_ptr<CubeSolver> get_solver(SolverType type, Cube* cube){
         switch (type)        {
         case SolverType::LBL:
-            return new LBLAlgorithm(cube);
+            return make_unique<LBLAlgorithm>(cube);
         case SolverType::CFOP:
-            return new CFOPAlgorithm(cube);
+            return make_unique<CFOPAlgorithm>(cube);
         case SolverType::KOCEIMBA:
-            return new KoceimbaAlgorithm(cube);
+            return make_unique<KoceimbaAlgorithm>(cube);
         default:
             return nullptr;
         }

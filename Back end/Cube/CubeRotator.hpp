@@ -60,7 +60,7 @@ public:
         RotationMove rotation_move(axis, num_rotations);
         for(auto& cubie_row: cubies_in_layer){
             for(auto& cubie: cubie_row){
-                CubieRotator* cubie_rotator = new CubieRotator(cubie);
+                unique_ptr<CubieRotator> cubie_rotator = make_unique<CubieRotator>(cubie);
                 cubie_rotator->rotate_cubie(rotation_move);
             }
         }
