@@ -1,0 +1,15 @@
+# VS Code user settings
+.vscode/
+
+# Windows executables
+*.exe
+
+# Visual Studio files
+.vs/
+
+# Build directory for web assembly
+build-web/
+
+# CMake user files
+CMakePresets.json
+CMakeSettings.json

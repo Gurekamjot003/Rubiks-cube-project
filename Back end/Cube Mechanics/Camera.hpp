@@ -27,6 +27,18 @@ public:
         return right_face;
     }
 
+    const FaceEnum get_left_face() &{
+        return CubeGeometryUtils::get_opposite_face(right_face);
+    }
+
+    const FaceEnum get_down_face() &{
+        return CubeGeometryUtils::get_opposite_face(up_face);
+    }
+
+    const FaceEnum get_back_face() &{
+        return CubeGeometryUtils::get_opposite_face(front_face);
+    }
+
     void set_front_face(FaceEnum face){
         front_face = face;
     }

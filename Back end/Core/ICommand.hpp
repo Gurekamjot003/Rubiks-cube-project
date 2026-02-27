@@ -5,5 +5,6 @@
 
 class ICommand{
 public:    
+    virtual ~ICommand() = default; 
     virtual void execute(Cube* cube, Camera* camera) = 0;
 };

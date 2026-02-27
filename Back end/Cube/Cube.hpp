@@ -13,6 +13,15 @@ class CubeRotator;
 class Cube{
     
 private:
+    std::map<FaceEnum, Color> color_mapping = {
+        {FaceEnum::UP, Color::WHITE},
+        {FaceEnum::DOWN, Color::YELLOW},
+        {FaceEnum::LEFT, Color::ORANGE},
+        {FaceEnum::RIGHT, Color::RED},
+        {FaceEnum::FRONT, Color::GREEN},
+        {FaceEnum::BACK, Color::BLUE}
+    };
+    
     std::vector<std::vector<std::vector<std::unique_ptr<Cubie>>>> cubies; 
     int n;
 
@@ -31,12 +40,12 @@ public:
             for(int j=0; j<n; ++j){
                 for(int k=0; k<n; ++k){
                     std::map<FaceEnum, Color> cubie_colors;
-                    if(i == 0) cubie_colors[FaceEnum::LEFT] = Color::ORANGE;
-                    if(i == n-1) cubie_colors[FaceEnum::RIGHT] = Color::RED;
-                    if(j == 0) cubie_colors[FaceEnum::DOWN] = Color::YELLOW;
-                    if(j == n-1) cubie_colors[FaceEnum::UP] = Color::WHITE;
-                    if(k == 0) cubie_colors[FaceEnum::BACK] = Color::BLUE;
-                    if(k == n-1) cubie_colors[FaceEnum::FRONT] = Color::GREEN;
+                    if(i == 0) cubie_colors[FaceEnum::LEFT] = color_mapping[FaceEnum::LEFT];
+                    if(i == n-1) cubie_colors[FaceEnum::RIGHT] = color_mapping[FaceEnum::RIGHT];
+                    if(j == 0) cubie_colors[FaceEnum::DOWN] = color_mapping[FaceEnum::DOWN];
+                    if(j == n-1) cubie_colors[FaceEnum::UP] = color_mapping[FaceEnum::UP];
+                    if(k == 0) cubie_colors[FaceEnum::BACK] = color_mapping[FaceEnum::BACK];
+                    if(k == n-1) cubie_colors[FaceEnum::FRONT] = color_mapping[FaceEnum::FRONT];
                     cubies[i][j][k] = std::make_unique<Cubie>(cubie_colors);
                 }
             }
@@ -205,4 +214,11 @@ public:
         
     }
 
+    const std::vector<std::vector<std::vector<std::unique_ptr<Cubie>>>>& get_all_cubies() const {
+        return this->cubies;
+    }
+
+    const Cubie* get_cubie(int i, int j, int k) const {
+        return cubies[i][j][k].get();
+    }
 };

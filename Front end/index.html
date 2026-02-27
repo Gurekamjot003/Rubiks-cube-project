@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rubik's Cube WASM Engine</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <script src="script.js"></script>
+    <script src="engine.js"></script>
+    <h1>🚀 Rubik's Cube WASM Engine</h1>
+    
+    <div class="controls">
+        <label>Cube Size (N): </label>
+        <input type="number" id="cubeSize" value="3" min="2" max="10" style="width: 50px;">
+        <button id="initButton" onclick="initCube()" >Initialize Cube</button>
+    </div>
+
+    <div class="controls" id="gameControls" style="display:none; opacity: 0.5; pointer-events: none;">
+        <input type="text" id="moveInput" placeholder="Enter move (e.g., R U R' U')">
+        <button onclick="applyMove()">Apply Move</button>
+        <button onclick="scramble()">Scramble</button>
+        <button onclick="display()">Print State</button>
+    </div>
+
+    <h3>Console Output (From C++):</h3>
+    <div id="output">Waiting for WASM to load...</div>
+
+</body>
+</html>

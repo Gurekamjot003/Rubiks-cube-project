@@ -8,4 +8,5 @@ protected:
 public:
     CubeSolver(Cube* cube) : cube(cube) {}
     virtual void solve() = 0;
+    virtual ~CubeSolver() = default;
 };

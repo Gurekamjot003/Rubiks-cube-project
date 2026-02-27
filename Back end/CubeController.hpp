@@ -3,7 +3,7 @@
 #include "Cube solving algorithms/CubeSolverFactory.hpp"
 #include "Cube Mechanics/CameraDisplayer.hpp"
 #include "Cube Mechanics/CubieColorSetter.hpp"
-
+#include "JSONAdapter/CubeWASMAdapter.hpp"
 
 class CubeController{
 private:
@@ -11,6 +11,7 @@ private:
     std::unique_ptr<CubeSolver> solver;
     std::unique_ptr<Camera> camera;
     std::unique_ptr<CameraDisplayer> displayer;
+    std::unique_ptr<IReport> reporter;
 
 public:
     CubeController(int n){
@@ -18,6 +19,7 @@ public:
         solver = CubeSolverFactory::get_solver(SolverType::LBL, cube.get());
         camera = std::make_unique<Camera>();
         displayer = std::make_unique<CameraDisplayer>(camera.get());
+        reporter = std::make_unique<CubeWASMAdapter>(cube.get());
     }
 
     void solve(){
@@ -51,17 +53,30 @@ public:
         setter->set_color(face, target, color);
     }
 
-    const FaceEnum get_front_face() &{
+    const FaceEnum get_front_face() {
         return camera->get_front_face();
     }
 
-    const FaceEnum get_up_face() &{
+    const FaceEnum get_up_face() {
         return camera->get_up_face();
     }
     
-    const FaceEnum get_right_face() &{
+    const FaceEnum get_right_face() {
         return camera->get_right_face();
     }
+
+    const FaceEnum get_left_face() {
+        return camera->get_left_face();
+    }
+
+    const FaceEnum get_down_face() {
+        return camera->get_down_face();
+    }
+
+    const FaceEnum get_back_face() {
+        return camera->get_back_face();
+    }
+    
     
     bool is_cube_solved(){
         return cube->is_solved();
@@ -76,5 +91,9 @@ public:
         // check for if cube is solvable or not
         // will apply this later
         return true;
+    }
+
+    std::string get_cube_state(){
+        return reporter->get_cube_state_JSON();
     }
 };

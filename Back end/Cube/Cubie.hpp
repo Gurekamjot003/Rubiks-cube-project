@@ -3,12 +3,10 @@
 #include "FaceEnum.hpp"
 #include "CubieType.hpp"
 #include "../Cube Mechanics/Axis.hpp"
-#include "../Cube Mechanics/RotationMove.hpp"
 #include <map>
 #include <vector>
 
 
-class Move;
 class CubieRotator;
 class Cubie{
 private:
@@ -28,7 +26,7 @@ public:
         else type = CubieType::EMPTY;
     }
 
-    const std::map<FaceEnum, Color> get_colors() &{
+    std::map<FaceEnum, Color> get_colors() const {
         return colors;
     }
 
@@ -36,18 +34,18 @@ public:
         colors = new_colors;
     }
 
-    const CubieType get_type() &{
+    CubieType get_type() const {
         return type;
     }
 
-    const Color get_color_from_face(FaceEnum face) &{
+    Color get_color_from_face(FaceEnum face) const {
         if(colors.find(face) == colors.end()) return Color::EMPTY;
-        return colors[face];
+        return colors.at(face);
     }
 
-    bool check_faces_present(std::vector<FaceEnum> faces){
+    bool check_faces_present(const std::vector<FaceEnum>& faces) const {
         if(faces.size() != colors.size()) return false;
-        for(auto& face: faces){
+        for(const auto& face: faces){
             if(colors.find(face) == colors.end()) return false;
         }
         return true;
@@ -58,7 +56,7 @@ public:
     }
 };
 
-class CubeGeometryUtils;
+class RotationMove;
 class CubieRotator{
     Cubie* cubie;
 public: 
