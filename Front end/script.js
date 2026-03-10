@@ -1,5 +1,3 @@
-// import * as CUBE from './RubiksCube.js';
-
 var Module = {
     // Redirect C++ cout to this HTML div
     print: (function() {
@@ -25,6 +23,7 @@ let cubeEngine = null;
 Module.onRuntimeInitialized = function() {
     document.getElementById('output').innerHTML = "✅ WASM Loaded! Ready to initialize cube.";
     document.getElementById('initButton').disabled = false;
+    init_3d_cube(document.getElementById('cube-container'));
 };
 
 function initCube() {
@@ -45,8 +44,9 @@ function initCube() {
         
         document.getElementById('output').innerHTML = `Created ${n}x${n}x${n} Cube!\n`;
         
-        // const cube_data = JSON.parse(cubeEngine.get_cube_state_JSON());
-        // console.log(cube_data);
+        const cube_data = JSON.parse(cubeEngine.get_cube_state_JSON());
+        console.log(cube_data);
+        create_cube_from_json(cube_data);
         cubeEngine.display_cube();
     } catch(e) {
         console.error(e);
@@ -63,6 +63,8 @@ function applyMove() {
     
     try {
         cubeEngine.apply_move(move);
+        const cube_data = JSON.parse(cubeEngine.get_cube_state_JSON());
+        create_cube_from_json(cube_data);
         cubeEngine.display_cube();
         document.getElementById('moveInput').value = ''; // clear input
     } catch(e) {
@@ -74,11 +76,17 @@ function scramble() {
     if(!cubeEngine) return;
     document.getElementById('output').innerHTML += `\n> Scrambling...\n`;
     cubeEngine.scramble_cube();
+    const cube_data = JSON.parse(cubeEngine.get_cube_state_JSON());
+    create_cube_from_json(cube_data);
     cubeEngine.display_cube();
 }
 
 function display() {
-    if(cubeEngine) cubeEngine.display_cube();
+    if(cubeEngine) {
+        const cube_data = JSON.parse(cubeEngine.get_cube_state_JSON());
+        create_cube_from_json(cube_data);
+        cubeEngine.display_cube();
+    }
 }
 
 window.initCube = initCube;

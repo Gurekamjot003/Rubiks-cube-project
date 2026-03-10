@@ -1,30 +1,19 @@
 #pragma once
 #include "../Cube/Cube.hpp"
 #include "./IReport.hpp"
+#include <string>
 
-
-std::string color_to_string(Color c) {
+// Helper function to convert Color enum to a single character
+char color_to_char(Color c) {
     switch(c) {
-        case Color::WHITE: return "WHITE";
-        case Color::YELLOW: return "YELLOW";
-        case Color::BLUE: return "BLUE";
-        case Color::GREEN: return "GREEN";
-        case Color::RED: return "RED";
-        case Color::ORANGE: return "ORANGE";
+        case Color::WHITE: return 'W';
+        case Color::YELLOW: return 'Y';
+        case Color::BLUE: return 'B';
+        case Color::GREEN: return 'G';
+        case Color::RED: return 'R';
+        case Color::ORANGE: return 'O';
+        default: return 'X'; // Internal/transparent face
     }
-    return "TRANSPARENT";
-}
-
-std::string face_to_string(FaceEnum f){
-    switch(f) {
-        case FaceEnum::UP: return "UP";
-        case FaceEnum::DOWN: return "DOWN";
-        case FaceEnum::LEFT: return "LEFT";
-        case FaceEnum::RIGHT: return "RIGHT";
-        case FaceEnum::FRONT: return "FRONT";
-        case FaceEnum::BACK: return "BACK";
-    }
-    return "UNKNOWN";
 }
 
 class CubeWASMAdapter: public IReport{
@@ -35,34 +24,41 @@ public:
     CubeWASMAdapter(Cube* cube): cube(cube){}
 
     std::string get_cube_state_JSON() const override{
-        
-        json cubeJson = json::array();
+        json resultJson;
         int size = cube->get_size();
-        for(int x=0; x<size; x++) {
-            json planeJson = json::array();
-            for(int y=0; y<size; y++) {
-                json rowJson = json::array();
-                for(int z=0; z<size; z++) {
-                    
-                    // 1. Get the read-only cubie using the public getter
+        resultJson["size"] = size;
+
+        json cubiesJson = json::array();
+
+        for (int x = 0; x < size; x++) {
+            for (int y = 0; y < size; y++) {
+                for (int z = 0; z < size; z++) {
                     const Cubie* cubie = cube->get_cubie(x, y, z);
                     
-                    // 2. Read its colors and format to JSON                    
-                    json cubieMap = {
-                        {"UP", color_to_string(cubie->get_color_from_face(FaceEnum::UP))},
-                        {"DOWN", color_to_string(cubie->get_color_from_face(FaceEnum::DOWN))},
-                        {"FRONT", color_to_string(cubie->get_color_from_face(FaceEnum::FRONT))},
-                        {"BACK", color_to_string(cubie->get_color_from_face(FaceEnum::BACK))},
-                        {"LEFT", color_to_string(cubie->get_color_from_face(FaceEnum::LEFT))},
-                        {"RIGHT", color_to_string(cubie->get_color_from_face(FaceEnum::RIGHT))}
-                    };
-                    rowJson.push_back(cubieMap);
-                }
-                planeJson.push_back(rowJson);
-            }
-            cubeJson.push_back(planeJson);
-        }
-        return cubeJson.dump();
-    }
+                    json cubieJson;
 
+                    // Position (using 0 to size-1 indices, as expected by frontend)
+                    cubieJson["pos"] = {
+                        {"x", x},
+                        {"y", y},
+                        {"z", z}
+                    };
+
+                    // Create a string of colors in 'R', 'L', 'U', 'D', 'F', 'B' order
+                    std::string colors_string = "";
+                    colors_string += color_to_char(cubie->get_color_from_face(FaceEnum::RIGHT));
+                    colors_string += color_to_char(cubie->get_color_from_face(FaceEnum::LEFT));
+                    colors_string += color_to_char(cubie->get_color_from_face(FaceEnum::UP));
+                    colors_string += color_to_char(cubie->get_color_from_face(FaceEnum::DOWN));
+                    colors_string += color_to_char(cubie->get_color_from_face(FaceEnum::FRONT));
+                    colors_string += color_to_char(cubie->get_color_from_face(FaceEnum::BACK));
+
+                    cubieJson["colors"] = colors_string;
+                    cubiesJson.push_back(cubieJson);
+                }
+            }
+        }
+        resultJson["cubies"] = cubiesJson;
+        return resultJson.dump();
+    }
 };
