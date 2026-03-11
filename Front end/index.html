@@ -1,34 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Rubik's Cube WASM Engine</title>
     <link rel="stylesheet" href="style.css">
+
+    <!-- Dependencies -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="engine.js"></script>
-</head>
-<body>
-    
+
+    <!-- App Logic & Module Definition (must be before RubiksCube.js) -->
     <script src="script.js"></script>
+    <script src="engine.js"></script>
+
+    <!-- Emscripten Output (must be last) -->
     <script src="RubiksCube.js"></script>
-    <h1>🚀 Rubik's Cube WASM Engine</h1>
-    <div id="cube-container" style="width: 400px; height: 400px; margin: auto;"></div>
-    
-    <div class="controls">
-        <label>Cube Size (N): </label>
-        <input type="number" id="cubeSize" value="3" min="2" max="10" style="width: 50px;">
-        <button id="initButton" onclick="initCube()" >Initialize Cube</button>
+</head>
+
+<body>
+
+    <!-- Entry Page -->
+    <div id="entry-page">
+        <h1>Rubik's Cube WASM Engine</h1>
+        <p>Enter the size of the cube to begin.</p>
+        <div class="control-group">
+            <input type="number" id="cubeSizeInput" value="3" min="2" max="20">
+            <button id="startButton" disabled>Loading WASM...</button>
+        </div>
     </div>
 
-    <div class="controls" id="gameControls" style="display:none; opacity: 0.5; pointer-events: none;">
-        <input type="text" id="moveInput" placeholder="Enter move (e.g., R U R' U')">
-        <button onclick="applyMove()">Apply Move</button>
-        <button onclick="scramble()">Scramble</button>
-        <button onclick="display()">Print State</button>
+    <!-- Main Application Page (hidden by default) -->
+    <div id="main-page" style="display: none;">
+        <div id="cube-container">
+            <div id="cube-box-wrapper">
+                <h2>3d rubiks cube</h2>
+                <div id="canvas-container"></div> <!-- Canvas will be injected here -->
+            </div>
+        </div>
+        <div id="controls-panel">
+            <h2>Controls</h2>
+            <div class="control-group">
+                <button id="scrambleButton">Scramble</button>
+                <button id="resetButton">Reset</button>
+                <button id="resetCameraButton">Reset View</button>
+            </div>
+            <div class="control-group">
+                <input type="text" id="moveInput" placeholder="e.g., R U R' U'">
+                <button id="applyMoveButton">Apply Move</button>
+            </div>
+            <div class="control-group">
+                <select id="solverSelect">
+                    <option value="LBL">Layer-by-Layer</option>
+                    <option value="CFOP">CFOP</option>
+                    <option value="Kociemba">Kociemba's</option>
+                </select>
+                <button id="solveButton">Solve</button>
+            </div>
+        </div>
     </div>
 
-    <h3>Console Output (From C++):</h3>
-    <div id="output">Waiting for WASM to load...</div>
+
 
 </body>
+
 </html>
