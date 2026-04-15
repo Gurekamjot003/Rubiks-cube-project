@@ -1,17 +1,24 @@
 #pragma once
 #include "ICommand.hpp"
 
-class FaceTurnCommand:public ICommand{
+class FaceTurnCommand : public ICommand
+{
 private:
     Axis axis;
     int layer;
     int times;
-public: 
-    FaceTurnCommand(Axis axis, int layer, int times): axis(axis), layer(layer), times(times){}
-    
-    void execute(Cube* cube, Camera* camera) override{
+
+public:
+    FaceTurnCommand(Axis axis, int layer, int times) : axis(axis), layer(layer), times(times) {}
+
+    void execute(Cube *cube, Camera *camera) override
+    {
         Move move(axis, layer, times);
         CubeRotator rotator(cube);
         rotator.rotate_cube(move);
     }
+    
+    Axis getAxis() const { return axis; }
+    int getLayer() const { return layer; }
+    int getTimes() const { return times; }
 };

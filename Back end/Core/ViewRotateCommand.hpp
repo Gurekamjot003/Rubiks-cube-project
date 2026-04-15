@@ -13,4 +13,7 @@ public:
         CameraRotator camera_rotator(camera);
         camera_rotator.rotate_camera(move);
     }
+
+    Axis getAxis() const { return axis; }
+    int getTimes() const { return times; }
 };

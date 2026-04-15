@@ -110,6 +110,7 @@ public:
         return {};
     }
 
+    // this function returns a face on basis of current face, axis of rotation and number of rotations.
     static FaceEnum get_next_face(Axis axis, int num_rotations, FaceEnum cur_face){
         auto& next_faces = next_face_mp[axis];
         int idx = -1;

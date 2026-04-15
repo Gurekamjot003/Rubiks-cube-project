@@ -54,6 +54,8 @@ public:
     std::vector<FaceEnum> get_orientation(){
         return {front_face, right_face, up_face};
     }
+
+    
 };
 
 class CameraRotator{
