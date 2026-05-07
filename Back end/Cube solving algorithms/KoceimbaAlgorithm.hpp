@@ -1,12 +1,15 @@
 #pragma once
 #include "CubeSolver.hpp"
 
-class KoceimbaAlgorithm: public CubeSolver{
+class KoceimbaAlgorithm : public CubeSolver
+{
 public:
-    KoceimbaAlgorithm(Cube* c) {
+    KoceimbaAlgorithm(Cube *c)
+    {
         this->cube = c;
     }
-    std::vector<std::string> solve(Cube* cube, Camera* camera) override{
+    std::vector<std::string> solve(Cube *cube, Camera *camera) override
+    {
         this->cube = cube;
         this->camera = camera;
         // apply koceimba algo
