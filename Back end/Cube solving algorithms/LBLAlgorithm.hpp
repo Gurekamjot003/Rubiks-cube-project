@@ -11,7 +11,9 @@ class LBLAlgorithm: public CubeSolver{
     }
 
     public:
-    LBLAlgorithm(){}
+    LBLAlgorithm(Cube* c) {
+        this->cube = c;
+    }
     std::vector<std::string> solve(Cube* cube, Camera* camera) override{
         this->cube = cube;
         this->camera = camera;

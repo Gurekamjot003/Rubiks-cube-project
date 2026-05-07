@@ -3,7 +3,9 @@
 
 class CFOPAlgorithm: public CubeSolver{
 public:
-    CFOPAlgorithm(){}
+    CFOPAlgorithm(Cube* c) {
+        this->cube = c;
+    }
     std::vector<std::string> solve(Cube* cube, Camera* camera) override{
         this->cube = cube;
         this->camera = camera;

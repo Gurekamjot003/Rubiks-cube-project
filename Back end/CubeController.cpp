@@ -18,7 +18,7 @@ EMSCRIPTEN_BINDINGS(my_module)
 
     class_<CubeController>("CubeController")
         .constructor<int>()
-        .function("solve", &CubeController::solve)
+        .function("solve", &CubeController::get_solve_moves)
         .function("set_solver", &CubeController::set_solver)
         .function("apply_move", &CubeController::apply_move)
         .function("get_move_animation_info", &CubeController::get_move_animation_info)

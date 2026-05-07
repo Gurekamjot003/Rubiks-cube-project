@@ -5637,6 +5637,17 @@ async function createWasm() {
     return e.errno;
   }
   }
+
+  function _random_get(buffer, size) {
+  try {
+  
+      randomFill(HEAPU8.subarray(buffer, buffer + size));
+      return 0;
+    } catch (e) {
+    if (typeof FS == 'undefined' || !(e.name === 'ErrnoError')) throw e;
+    return e.errno;
+  }
+  }
 init_ClassHandle();
 init_RegisteredPointer();
 assert(emval_handles.length === 5 * 2);
@@ -6265,7 +6276,9 @@ var wasmImports = {
   /** @export */
   fd_seek: _fd_seek,
   /** @export */
-  fd_write: _fd_write
+  fd_write: _fd_write,
+  /** @export */
+  random_get: _random_get
 };
 var wasmExports;
 createWasm();

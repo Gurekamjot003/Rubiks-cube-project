@@ -91,10 +91,6 @@ public:
         target_cubie->set_color_by_face(face, color);
     }
 
-    void scramble_cube(){
-        //scramble cube
-    }
-
     std::vector<std::vector<Cubie*>> get_cubies_in_layer(Axis axis, int layer, Coordinate top_left = Coordinate(0, 0), Coordinate top_right = Coordinate(0, 1)){
         int di = 1, end_i = n;
         int dj = 1, end_j = n;

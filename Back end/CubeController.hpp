@@ -5,6 +5,7 @@
 #include "Cube Mechanics/CubieColorSetter.hpp"
 #include "JSONAdapter/CubeWASMAdapter.hpp"
 #include <nlohmann/json.hpp>
+#include <random>
 using json = nlohmann::json;
 
 class CubeController
@@ -60,9 +61,16 @@ public:
         }
     }
 
-    void scramble_cube()
+    void scramble_cube(int count = 20)
     {
-        cube->scramble_cube();
+        // apply some random moves to scramble the cube
+        std::vector<std::string> scramble_moves = {"R", "U", "R'", "U'", "L'", "U'", "L", "U"};
+        for (int i = 0; i < count; ++i) {
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::uniform_int_distribution<> dis(0, scramble_moves.size() - 1);
+            apply_move(scramble_moves[dis(gen)]);
+        }
     }
 
     void display_cube()

@@ -374,7 +374,7 @@ function scramble() {
     console.log(`> Scrambling...`);
 
     // Call the C++ scramble function
-    cubeEngine.scramble_cube();
+    cubeEngine.scramble_cube(20);
 
     // Get the cube size
     const n = parseInt(document.getElementById('cubeSizeInput').value);
