@@ -131,4 +131,17 @@ public:
 
         return cube->get_cubies_in_layer(axis, layer, top_left, top_right);
     }
+
+    static std::vector<Cubie*> get_cubie_pieces_by_face(FaceEnum face, Cube* cube, CubieType type){
+        
+        std::vector<std::vector<Cubie*>> cubies = get_cubies_by_face(face, cube);
+        std::vector<Cubie*> cubie_pieces;
+        for(auto& row: cubies){
+            for(auto& cubie: row){
+                if(cubie->get_type() == type) cubie_pieces.push_back(cubie);
+            }
+        }
+        return cubie_pieces;
+    }
+
 };

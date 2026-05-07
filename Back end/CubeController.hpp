@@ -26,9 +26,24 @@ public:
         reporter = std::make_unique<CubeWASMAdapter>(cube.get());
     }
 
-    void solve()
+    std::string get_solve_moves()
     {
-        solver->solve();
+        if (!solver)
+            set_solver(SolverType::LBL); // Default to LBL if no solver is set
+
+        Cube cube_copy(*cube); // Create a copy of the cube to solve
+        Camera camera_copy(*camera); // Create a copy of the camera for the solver
+        
+        // Solve the copied cube and get the moves
+        std::vector<std::string> moves = solver->solve(&cube_copy, &camera_copy);
+
+        // Join the moves into a single string separated by spaces
+        std::string result;
+        for (const auto& move : moves) {
+            result += move + " ";
+        }
+
+        return result;
     }
 
     void set_solver(SolverType type)
@@ -121,7 +136,7 @@ public:
                 obj["simultaneous"] = true;
                 arr.push_back(obj);
             }
-            // view rotates ignored for now
+            
         }
         return arr.dump();
     }

@@ -3,8 +3,11 @@
 
 class KoceimbaAlgorithm: public CubeSolver{
 public:
-    KoceimbaAlgorithm(Cube* cube) : CubeSolver(cube) {}
-    void solve(){
+    KoceimbaAlgorithm(){}
+    std::vector<std::string> solve(Cube* cube, Camera* camera) override{
+        this->cube = cube;
+        this->camera = camera;
         // apply koceimba algo
+        return {};
     }
 };

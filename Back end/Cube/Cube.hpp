@@ -53,6 +53,20 @@ public:
         corner_piece_coordinates = {Coordinate(0, 0), Coordinate(0, n-1), Coordinate(n-1, 0), Coordinate(n-1, n-1)};
     }
 
+    Cube(const Cube& other): n(other.n){
+        cubies.resize(n);
+        for(int i = 0; i<n; i++){
+            cubies[i].resize(n);
+            for(int j = 0; j<n; j++){
+                cubies[i][j].resize(n);
+                for(int k = 0; k<n; k++){
+                    cubies[i][j][k] = std::make_unique<Cubie>(*other.cubies[i][j][k]);
+                }
+            }
+        }
+        corner_piece_coordinates = other.corner_piece_coordinates;
+    }
+
     void swap_cubies(Axis axis, int layer, Coordinate from, Coordinate to){
         int r_from = from.get_x();
         int c_from = from.get_y();
