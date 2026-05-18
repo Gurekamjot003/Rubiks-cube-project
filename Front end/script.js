@@ -20,6 +20,12 @@ var Module = {
 // This object handles all cube logic like rotations, scrambling, etc.
 let cubeEngine = null;
 
+// Global variable to track solution moves and current index
+let currentSolution = {
+    moves: [],
+    currentIndex: 0
+};
+
 // ==================== PAGE INITIALIZATION ====================
 // Wait for the HTML page to fully load before running any code
 // This ensures all HTML elements are ready to be accessed
@@ -83,6 +89,11 @@ function startApp() {
 
     // Solve button: attempt to solve the cube (not implemented yet)
     document.getElementById('solveButton').addEventListener('click', solve);
+
+    // Solution panel buttons
+    document.getElementById('applyNextMoveButton').addEventListener('click', applyNextMove);
+    document.getElementById('applyAllMovesButton').addEventListener('click', applyAllMoves);
+    document.getElementById('closeSolutionButton').addEventListener('click', closeSolution);
 
     // Keyboard: allow pressing Enter to apply a move (instead of clicking the button)
     document.getElementById('moveInput').addEventListener('keydown', (e) => {
@@ -388,8 +399,8 @@ function scramble() {
     });
 }
 
-// Attempts to solve the cube
-// Called when the user clicks the "Solve" button (not implemented yet)
+// Attempts to solve the cube using the selected algorithm
+// Called when the user clicks the "Solve" button
 function solve() {
     if(!cubeEngine) return;
 
@@ -397,6 +408,133 @@ function solve() {
     const algo = document.getElementById('solverSelect').value;
     console.log(`> Solving with ${algo}...`);
 
-    // TODO: Add cubeEngine.solve(algo) call when implemented in C++
-    alert(`Solving with ${algo} is not implemented yet.`);
+    try {
+        // Call C++ method to get solution moves as JSON
+        const solutionJSON = cubeEngine.get_solution_JSON(algo);
+        const solution = JSON.parse(solutionJSON);
+        
+        // Store the solution moves globally
+        currentSolution.moves = solution.moves;
+        currentSolution.currentIndex = 0;
+        
+        console.log(`Solution found with ${solution.moveCount} moves`);
+        displaySolution(solution);
+        
+        // Show the solution panel
+        document.getElementById('solution-panel').style.display = 'block';
+    } catch (error) {
+        console.error('Error solving cube:', error);
+        alert('Error solving cube: ' + error.message);
+    }
+}
+
+// Display the solution moves in the UI
+function displaySolution(solution) {
+    const solutionInfo = document.getElementById('solution-info');
+    const solutionMoves = document.getElementById('solution-moves');
+    
+    // Display move count and progress
+    solutionInfo.innerHTML = `<p>Total moves: <strong>${solution.moveCount}</strong> | Current: <strong>0/${solution.moveCount}</strong></p>`;
+    
+    // Display moves as a list with styling for current move
+    let movesHTML = '<div class="moves-list"><p>';
+    solution.moves.forEach((move, index) => {
+        if (index === 0) {
+            movesHTML += `<span class="move current-move">${move}</span>`;
+        } else {
+            movesHTML += `<span class="move">${move}</span>`;
+        }
+        if ((index + 1) % 10 === 0) {
+            movesHTML += '</p><p>';
+        } else {
+            movesHTML += ' ';
+        }
+    });
+    movesHTML += '</p></div>';
+    solutionMoves.innerHTML = movesHTML;
+}
+
+// Apply the next move in the solution
+function applyNextMove() {
+    if (currentSolution.moves.length === 0) return;
+    
+    if (currentSolution.currentIndex >= currentSolution.moves.length) {
+        alert('All moves have been applied!');
+        return;
+    }
+    
+    const move = currentSolution.moves[currentSolution.currentIndex];
+    console.log(`Applying move ${currentSolution.currentIndex + 1}: ${move}`);
+    
+    // Apply the move to the cube
+    cubeEngine.apply_move(move);
+    
+    // Update display
+    const n = parseInt(document.getElementById('cubeSizeInput').value);
+    const cube_data = JSON.parse(cubeEngine.get_cube_state_JSON());
+    create_cube_from_json(cube_data);
+    
+    // Increment the index
+    currentSolution.currentIndex++;
+    
+    // Update the solution display with progress
+    const total = currentSolution.moves.length;
+    const info = document.getElementById('solution-info');
+    info.innerHTML = `<p>Total moves: <strong>${total}</strong> | Current: <strong>${currentSolution.currentIndex}/${total}</strong></p>`;
+    
+    // Update move highlighting
+    highlightCurrentMove();
+}
+
+// Apply all remaining moves automatically
+function applyAllMoves() {
+    if (currentSolution.moves.length === 0) return;
+    
+    console.log(`Applying all ${currentSolution.moves.length} moves...`);
+    
+    // Apply each remaining move
+    while (currentSolution.currentIndex < currentSolution.moves.length) {
+        const move = currentSolution.moves[currentSolution.currentIndex];
+        cubeEngine.apply_move(move);
+        currentSolution.currentIndex++;
+    }
+    
+    // Update display
+    const cube_data = JSON.parse(cubeEngine.get_cube_state_JSON());
+    create_cube_from_json(cube_data);
+    
+    // Update the solution display with final progress
+    const total = currentSolution.moves.length;
+    const info = document.getElementById('solution-info');
+    info.innerHTML = `<p>Total moves: <strong>${total}</strong> | Current: <strong>${currentSolution.currentIndex}/${total}</strong></p>`;
+    
+    // Update move highlighting
+    highlightCurrentMove();
+    
+    console.log('All moves applied!');
+}
+
+// Update the visual highlighting of the current move in the list
+function highlightCurrentMove() {
+    const moveElements = document.querySelectorAll('.moves-list .move');
+    moveElements.forEach((el, index) => {
+        if (index === currentSolution.currentIndex) {
+            el.classList.add('current-move');
+        } else {
+            el.classList.remove('current-move');
+        }
+        
+        if (index < currentSolution.currentIndex) {
+            el.classList.add('applied-move');
+        } else {
+            el.classList.remove('applied-move');
+        }
+    });
+}
+
+// Close the solution panel
+function closeSolution() {
+    document.getElementById('solution-panel').style.display = 'none';
+    currentSolution.moves = [];
+    currentSolution.currentIndex = 0;
 }

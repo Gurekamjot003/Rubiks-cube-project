@@ -34,6 +34,7 @@ EMSCRIPTEN_BINDINGS(my_module)
         .function("is_cube_solved", &CubeController::is_cube_solved)
         .function("is_cube_valid", &CubeController::is_cube_valid)
         .function("get_cube_state_JSON", &CubeController::get_cube_state)
-        .function("is_cube_solvable", &CubeController::is_cube_solvable);
+        .function("is_cube_solvable", &CubeController::is_cube_solvable)
+        .function("get_solution_JSON", &CubeController::get_solution_JSON);
 }
 #endif

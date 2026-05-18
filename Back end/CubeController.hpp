@@ -3,10 +3,12 @@
 #include "Cube solving algorithms/CubeSolverFactory.hpp"
 #include "Cube Mechanics/CameraDisplayer.hpp"
 #include "Cube Mechanics/CubieColorSetter.hpp"
+#ifdef EMSCRIPTEN
 #include "JSONAdapter/CubeWASMAdapter.hpp"
 #include <nlohmann/json.hpp>
-#include <random>
 using json = nlohmann::json;
+#endif
+#include <random>
 
 class CubeController
 {
@@ -15,7 +17,9 @@ private:
     std::unique_ptr<CubeSolver> solver;
     std::unique_ptr<Camera> camera;
     std::unique_ptr<CameraDisplayer> displayer;
+#ifdef EMSCRIPTEN
     std::unique_ptr<IReport> reporter;
+#endif
 
 public:
     CubeController(int n)
@@ -24,7 +28,9 @@ public:
         solver = CubeSolverFactory::get_solver(SolverType::LBL, cube.get());
         camera = std::make_unique<Camera>();
         displayer = std::make_unique<CameraDisplayer>(camera.get());
+#ifdef EMSCRIPTEN
         reporter = std::make_unique<CubeWASMAdapter>(cube.get());
+#endif
     }
 
     std::string get_solve_moves()
@@ -32,15 +38,16 @@ public:
         if (!solver)
             set_solver(SolverType::LBL); // Default to LBL if no solver is set
 
-        Cube cube_copy(*cube); // Create a copy of the cube to solve
+        Cube cube_copy(*cube);       // Create a copy of the cube to solve
         Camera camera_copy(*camera); // Create a copy of the camera for the solver
-        
+
         // Solve the copied cube and get the moves
         std::vector<std::string> moves = solver->solve(&cube_copy, &camera_copy);
 
         // Join the moves into a single string separated by spaces
         std::string result;
-        for (const auto& move : moves) {
+        for (const auto &move : moves)
+        {
             result += move + " ";
         }
 
@@ -65,7 +72,8 @@ public:
     {
         // apply some random moves to scramble the cube
         std::vector<std::string> scramble_moves = {"R", "U", "R'", "U'", "L'", "U'", "L", "U"};
-        for (int i = 0; i < count; ++i) {
+        for (int i = 0; i < count; ++i)
+        {
             std::random_device rd;
             std::mt19937 gen(rd());
             std::uniform_int_distribution<> dis(0, scramble_moves.size() - 1);
@@ -117,6 +125,7 @@ public:
     }
 
     // return animation info for a given move (without modifying cube state)
+#ifdef EMSCRIPTEN
     std::string get_move_animation_info(std::string move)
     {
         auto commands = MoveParser::parse(move, camera.get(), cube.get());
@@ -144,10 +153,10 @@ public:
                 obj["simultaneous"] = true;
                 arr.push_back(obj);
             }
-            
         }
         return arr.dump();
     }
+#endif
 
     bool is_cube_solved()
     {
@@ -168,8 +177,31 @@ public:
         return true;
     }
 
+    // return JSON string representation of cube state
+#ifdef EMSCRIPTEN
     std::string get_cube_state()
     {
         return reporter->get_cube_state_JSON();
     }
+#endif
+
+    // returns the solution moves as a JSON string
+#ifdef EMSCRIPTEN
+    std::string get_solution_JSON(std::string solverType = "LBL")
+    {
+        if (!solver)
+            set_solver(SolverType::LBL);
+
+        Cube cube_copy(*cube);
+        Camera camera_copy(*camera);
+
+        std::vector<std::string> moves = solver->solve(&cube_copy, &camera_copy);
+
+        json solution = json::object();
+        solution["moves"] = moves;
+        solution["moveCount"] = moves.size();
+
+        return solution.dump();
+    }
+#endif
 };

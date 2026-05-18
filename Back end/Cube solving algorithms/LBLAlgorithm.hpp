@@ -3,14 +3,20 @@
 
 class LBLAlgorithm : public CubeSolver
 {
-    void ruru()
+    void ruru(int times = 1)
     {
-        apply_move("R U R' U'");
+        for (int i = 0; i < times; i++)
+        {
+            apply_move("R U R' U'");
+        }
     }
 
-    void lulu()
+    void lulu(int times = 1)
     {
-        apply_move("L' U' L U");
+        for (int i = 0; i < times; i++)
+        {
+            apply_move("L' U' L U");
+        }
     }
 
 public:
@@ -22,14 +28,17 @@ public:
     {
         this->cube = cube;
         this->camera = camera;
+        CameraDisplayer displayer(camera);
+
         moves.clear();
         // apply lbl algo
 
         // first we will find white center and put it in the down face and yellow will automatically be on the up face.
-        white_down();
+        white_down(displayer);
 
+        displayer.display(cube);
         // step 1 white cross
-        white_cross();
+        white_cross(displayer);
 
         // step 2 cross
 
@@ -46,7 +55,7 @@ public:
         return moves;
     }
 
-    void white_cross()
+    void white_cross(CameraDisplayer &displayer)
     {
         // step 1 daisy
         for (int temp = 0; temp < 4; temp++)
@@ -63,9 +72,10 @@ public:
             }
 
             // case 1 - white edge piece is already in daisy
-            if (up_front_cubie and up_front_cubie->get_color_from_face(camera->get_up_face()) == Color::WHITE)
+            if (up_front_cubie && up_front_cubie->get_color_from_face(camera->get_up_face()) == Color::WHITE)
             {
                 apply_move("U");
+                displayer.display(cube);
                 continue;
             }
 
@@ -80,24 +90,26 @@ public:
                 break;
             }
 
-            while (down_front_cubie and !down_front_cubie->check_faces_present({camera->get_front_face()}))
+            while (down_front_cubie && !down_front_cubie->check_faces_present({camera->get_front_face()}))
             {
                 apply_move("D");
+                displayer.display(cube);
             }
 
-            if (down_front_cubie and down_front_cubie->get_color_from_face(camera->get_down_face()) == Color::WHITE)
+            if (down_front_cubie && down_front_cubie->get_color_from_face(camera->get_down_face()) == Color::WHITE)
             {
                 apply_move("F2");
                 apply_move("U");
+                displayer.display(cube);
                 continue;
             }
 
             // case 3 - search for white edge piece in front face, until it is not found, the front face will be rotated
-            std::vector<Cubie *> front = CubeGeometryUtils::get_cubie_pieces_by_face(camera->get_front_face(), cube, CubieType::EDGE);
             Cubie *front_cubie = nullptr; // this is the cubie of concern, here we have to place white edge piece facing front
 
             while (!front_cubie)
             {
+                std::vector<Cubie *> front = CubeGeometryUtils::get_cubie_pieces_by_face(camera->get_front_face(), cube, CubieType::EDGE);
                 for (auto &cubie : front)
                 {
                     if (cubie->get_color_from_face(camera->get_front_face()) == Color::WHITE)
@@ -109,6 +121,7 @@ public:
                 if (!front_cubie)
                 {
                     apply_move("d");
+                    displayer.display(cube);    
                 }
             }
 
@@ -132,12 +145,13 @@ public:
 
             // next white edge piece
             apply_move("U");
+            displayer.display(cube);
         }
 
         // step 2 white cross from daisy
     }
 
-    void white_down()
+    void white_down(CameraDisplayer &displayer)
     {
         // find white center
 

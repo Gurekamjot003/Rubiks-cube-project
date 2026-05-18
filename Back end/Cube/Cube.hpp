@@ -170,7 +170,7 @@ public:
                         cur_colors.insert(color);
                     }
 
-                    if((has_white && has_yellow) or (has_red && has_orange) or (has_green && has_blue)) return false;
+                    if((has_white && has_yellow) || (has_red && has_orange) || (has_green && has_blue)) return false;
 
                     if(cubie->get_type() == CubieType::CORNER) corner_count[cur_colors]++;
                     else if(cubie->get_type() == CubieType::EDGE) edge_count[cur_colors]++;

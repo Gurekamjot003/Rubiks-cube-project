@@ -1,20 +1,18 @@
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.17)
 project(RubiksCube)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --bind")
+if(EMSCRIPTEN)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --bind -sALLOW_MEMORY_GROWTH")
+endif()
 
-include(FetchContent)
-FetchContent_Declare(
-  nlohmann_json
-  GIT_REPOSITORY https://github.com/nlohmann/json.git
-  GIT_TAG        v3.11.3
-)
-FetchContent_MakeAvailable(nlohmann_json)
+# Create a minimal nlohmann_json interface library (header-only, no fetching)
+add_library(nlohmann_json INTERFACE)
+target_include_directories(nlohmann_json INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(RubiksCube 
+set(RUBIKS_CUBE_SOURCES
     CubeController.cpp
     CubeController.hpp
     Core/FaceTurnCommand.hpp
@@ -48,7 +46,12 @@ add_executable(RubiksCube
     Utils/CubeGeometryUtils.hpp
     JSONAdapter/IReport.hpp
     JSONAdapter/CubeWASMAdapter.hpp
-
 )
 
-target_link_libraries(RubiksCube PRIVATE nlohmann_json::nlohmann_json)
+add_executable(RubiksCube ${RUBIKS_CUBE_SOURCES})
+target_link_libraries(RubiksCube PRIVATE nlohmann_json)
+
+if(NOT EMSCRIPTEN)
+    add_executable(RubiksCubeConsole main.cpp ${RUBIKS_CUBE_SOURCES})
+    target_link_libraries(RubiksCubeConsole PRIVATE nlohmann_json)
+endif()

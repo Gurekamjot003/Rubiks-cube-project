@@ -4,6 +4,7 @@
 #include "../Core/ICommand.hpp"
 #include "../Utils/CameraUtils.hpp"
 #include "../Utils/CubeGeometryUtils.hpp"
+#include "../Cube Mechanics/CameraDisplayer.hpp"
 #include <vector>
 #include <string>
 

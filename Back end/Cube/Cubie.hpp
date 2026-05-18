@@ -44,8 +44,15 @@ public:
     }
 
     bool check_faces_present(const std::vector<FaceEnum>& faces) const {
-        if(faces.size() != colors.size()) return false;
         for(const auto& face: faces){
+            if(colors.find(face) == colors.end()) return false;
+        }
+        return true;
+    }
+
+    bool check_faces_match(const std::map<FaceEnum, Color>& face_color_map) const {
+        if(face_color_map.size() != colors.size()) return false;
+        for(const auto&[face, color]: face_color_map){
             if(colors.find(face) == colors.end()) return false;
         }
         return true;

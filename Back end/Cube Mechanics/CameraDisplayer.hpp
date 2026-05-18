@@ -52,11 +52,15 @@ public:
         FaceEnum front_face = camera->get_front_face();
         FaceEnum up_face = camera->get_up_face();
         FaceEnum right_face = camera->get_right_face();
+        FaceEnum left_face = camera->get_left_face();
+        FaceEnum down_face = camera->get_down_face();
+        FaceEnum back_face = camera->get_back_face();
 
         std::cout << "\n\n--------Current cube state---------\n\n";
 
         std::vector<std::vector<Color>> up_colors = face_displayer(up_face, cube);
         for (auto& row : up_colors) {
+            for(int t = 0; t<=cube->get_size(); t++) std::cout << "  "; // padding for upper face
             for (auto& color : row) {
                 std::cout << get_color_string(color) << " "; // Use the new function
             }
@@ -66,14 +70,29 @@ public:
         
         std::vector<std::vector<Color>> front_colors = face_displayer(front_face, cube);
         std::vector<std::vector<Color>> right_colors = face_displayer(right_face, cube);
-        
+        std::vector<std::vector<Color>> left_colors = face_displayer(left_face, cube);
+        std::vector<std::vector<Color>> down_colors = face_displayer(down_face, cube);
+        std::vector<std::vector<Color>> back_colors = face_displayer(back_face, cube);
+
         for (int i = 0; i < cube->get_size(); i++) {
+            
+            for (auto& color : left_colors[i]) std::cout << get_color_string(color) << " ";
+            std::cout << "  ";
             for (auto& color : front_colors[i]) std::cout << get_color_string(color) << " ";
             std::cout << "  ";
             for (auto& color : right_colors[i]) std::cout << get_color_string(color) << " ";
+            std::cout << "  ";
+            for (auto& color : back_colors[i]) std::cout << get_color_string(color) << " ";
             std::cout<<std::endl;
         }
         std::cout << std::endl;
-
+        
+        for (auto& row : down_colors) {
+            for(int t = 0; t<=cube->get_size(); t++) std::cout << "  "; // padding for down face
+            for (auto& color : row) {
+                std::cout << get_color_string(color) << " "; // Use the new function
+            }
+            std::cout << std::endl;
+        }
     }
 };
