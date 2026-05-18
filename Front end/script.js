@@ -276,7 +276,74 @@ function generateViewRotationAnimation(moveToken, cubeSize) {
     }];
 }
 
-// Applies a cube move (e.g., "R", "U", "F'", "Rw2", "2R3", "x", "y'", "z2", etc.)
+// ==================== UNIFIED MOVE APPLICATION WITH ANIMATION ====================
+// Helper function to apply a single move with animation
+// This is used by both user input (applyMove) and solver moves (applyNextMove, applyAllMoves)
+//
+// Parameters:
+//   moveToken - The move to apply (e.g., "R", "U'", "x", "2R", etc.)
+//   callback - Function to call after the move is applied and animated
+function applySingleMoveWithAnimation(moveToken, callback) {
+    if (!cubeEngine) {
+        if (callback) callback();
+        return;
+    }
+
+    const cubeSize = parseInt(document.getElementById('cubeSizeInput').value);
+
+    try {
+        if (isViewRotationMove(moveToken)) {
+            // Handle view rotation moves (x, y, z) with simultaneous animation
+            const animations = generateViewRotationAnimation(moveToken, cubeSize);
+            const expandedMoves = expandViewRotationMove(moveToken, cubeSize);
+
+            // Animate with simultaneous flag
+            animateSequence(animations, MOVE_ANIMATION_DURATION, () => {
+                // Apply all layer moves that make up this view rotation
+                for (const layerMove of expandedMoves) {
+                    cubeEngine.apply_move(layerMove);
+                }
+
+                // Get the new cube state and re-render
+                const cube_data = JSON.parse(cubeEngine.get_cube_state_JSON());
+                create_cube_from_json(cube_data);
+
+                // Call the callback when done
+                if (callback) callback();
+            });
+        } else {
+            // Regular move - get animation info and animate
+            if (typeof cubeEngine.get_move_animation_info === 'function') {
+                const infoJSON = cubeEngine.get_move_animation_info(moveToken);
+                const animations = JSON.parse(infoJSON);
+
+                // Animate the move on screen
+                animateSequence(animations.slice(), MOVE_ANIMATION_DURATION, () => {
+                    // After animation is done, update the internal cube state in C++
+                    cubeEngine.apply_move(moveToken);
+
+                    // Get the new cube state from C++ and re-render the cube
+                    const cube_data = JSON.parse(cubeEngine.get_cube_state_JSON());
+                    create_cube_from_json(cube_data);
+
+                    // Call the callback when done
+                    if (callback) callback();
+                });
+            } else {
+                // Fallback: if animation info is not available, just apply the move without animation
+                cubeEngine.apply_move(moveToken);
+                const cube_data = JSON.parse(cubeEngine.get_cube_state_JSON());
+                create_cube_from_json(cube_data);
+                if (callback) callback();
+            }
+        }
+    } catch (e) {
+        console.error(`Error processing move "${moveToken}":`, e);
+        if (callback) callback();
+    }
+}
+
+// Applies a sequence of moves from user input with animation
 // The move is read from the input field, animated on screen, and applied to the cube state
 function applyMove() {
     // Get the move string from the input field and remove extra whitespace
@@ -293,80 +360,20 @@ function applyMove() {
     // Split the move string into individual moves
     const rawTokens = move.split(/\s+/);
 
-    // Process tokens: group view rotations, keep regular moves as-is
-    const processedTokens = [];
-    for (const token of rawTokens) {
-        if (isViewRotationMove(token)) {
-            processedTokens.push({ type: 'viewRotation', token: token });
-        } else {
-            processedTokens.push({ type: 'regular', token: token });
-        }
-    }
-
     let idx = 0;
 
     // This function processes moves one at a time
     function doNext() {
         // If all moves have been processed, clear the input and finish
-        if (idx >= processedTokens.length) {
+        if (idx >= rawTokens.length) {
             document.getElementById('moveInput').value = '';
             return;
         }
 
-        const moveInfo = processedTokens[idx++];
-        const tok = moveInfo.token;
+        const moveToken = rawTokens[idx++];
 
-        if (moveInfo.type === 'viewRotation') {
-            // Handle view rotation moves with simultaneous animation
-            const animations = generateViewRotationAnimation(tok, cubeSize);
-            const expandedMoves = expandViewRotationMove(tok, cubeSize);
-
-            // Animate with simultaneous flag
-            animateSequence(animations, MOVE_ANIMATION_DURATION, () => {
-                // Apply all layer moves that make up this view rotation
-                for (const layerMove of expandedMoves) {
-                    cubeEngine.apply_move(layerMove);
-                }
-
-                // Get the new cube state and re-render
-                const cube_data = JSON.parse(cubeEngine.get_cube_state_JSON());
-                create_cube_from_json(cube_data);
-
-                // Process the next move
-                doNext();
-            });
-        } else {
-            // Regular move - process normally
-            if (typeof cubeEngine.get_move_animation_info === 'function') {
-                try {
-                    const infoJSON = cubeEngine.get_move_animation_info(tok);
-                    const animations = JSON.parse(infoJSON);
-
-                    // Animate the move on screen
-                    animateSequence(animations.slice(), MOVE_ANIMATION_DURATION, () => {
-                        // After animation is done, update the internal cube state in C++
-                        cubeEngine.apply_move(tok);
-
-                        // Get the new cube state from C++ and re-render the cube
-                        const cube_data = JSON.parse(cubeEngine.get_cube_state_JSON());
-                        create_cube_from_json(cube_data);
-
-                        // Process the next move
-                        doNext();
-                    });
-                } catch (e) {
-                    console.error(`Error processing move "${tok}":`, e);
-                    document.getElementById('moveInput').value = '';
-                    doNext();
-                }
-            } else {
-                // Fallback: if animation info is not available, just apply the move without animation
-                cubeEngine.apply_move(tok);
-                const cube_data = JSON.parse(cubeEngine.get_cube_state_JSON());
-                create_cube_from_json(cube_data);
-                doNext();
-            }
-        }
+        // Apply the move with animation
+        applySingleMoveWithAnimation(moveToken, doNext);
     }
 
     try {
@@ -454,7 +461,7 @@ function displaySolution(solution) {
     solutionMoves.innerHTML = movesHTML;
 }
 
-// Apply the next move in the solution
+// Apply the next move in the solution with animation
 function applyNextMove() {
     if (currentSolution.moves.length === 0) return;
     
@@ -466,52 +473,54 @@ function applyNextMove() {
     const move = currentSolution.moves[currentSolution.currentIndex];
     console.log(`Applying move ${currentSolution.currentIndex + 1}: ${move}`);
     
-    // Apply the move to the cube
-    cubeEngine.apply_move(move);
-    
-    // Update display
-    const n = parseInt(document.getElementById('cubeSizeInput').value);
-    const cube_data = JSON.parse(cubeEngine.get_cube_state_JSON());
-    create_cube_from_json(cube_data);
-    
-    // Increment the index
-    currentSolution.currentIndex++;
-    
-    // Update the solution display with progress
-    const total = currentSolution.moves.length;
-    const info = document.getElementById('solution-info');
-    info.innerHTML = `<p>Total moves: <strong>${total}</strong> | Current: <strong>${currentSolution.currentIndex}/${total}</strong></p>`;
-    
-    // Update move highlighting
-    highlightCurrentMove();
+    // Apply the move with animation using the unified function
+    applySingleMoveWithAnimation(move, () => {
+        // Increment the index after animation completes
+        currentSolution.currentIndex++;
+        
+        // Update the solution display with progress
+        const total = currentSolution.moves.length;
+        const info = document.getElementById('solution-info');
+        info.innerHTML = `<p>Total moves: <strong>${total}</strong> | Current: <strong>${currentSolution.currentIndex}/${total}</strong></p>`;
+        
+        // Update move highlighting
+        highlightCurrentMove();
+    });
 }
 
-// Apply all remaining moves automatically
+// Apply all remaining moves automatically with animation
 function applyAllMoves() {
     if (currentSolution.moves.length === 0) return;
     
     console.log(`Applying all ${currentSolution.moves.length} moves...`);
     
-    // Apply each remaining move
-    while (currentSolution.currentIndex < currentSolution.moves.length) {
-        const move = currentSolution.moves[currentSolution.currentIndex];
-        cubeEngine.apply_move(move);
-        currentSolution.currentIndex++;
+    let moveIndex = currentSolution.currentIndex;
+    
+    // Function to apply moves sequentially with animation
+    function applyNextMoveInSequence() {
+        if (moveIndex >= currentSolution.moves.length) {
+            // All moves applied
+            currentSolution.currentIndex = moveIndex;
+            const total = currentSolution.moves.length;
+            const info = document.getElementById('solution-info');
+            info.innerHTML = `<p>Total moves: <strong>${total}</strong> | Current: <strong>${currentSolution.currentIndex}/${total}</strong></p>`;
+            highlightCurrentMove();
+            console.log('All moves applied!');
+            return;
+        }
+        
+        const move = currentSolution.moves[moveIndex];
+        moveIndex++;
+        
+        // Apply the move with animation
+        applySingleMoveWithAnimation(move, () => {
+            // After animation, continue with next move
+            applyNextMoveInSequence();
+        });
     }
     
-    // Update display
-    const cube_data = JSON.parse(cubeEngine.get_cube_state_JSON());
-    create_cube_from_json(cube_data);
-    
-    // Update the solution display with final progress
-    const total = currentSolution.moves.length;
-    const info = document.getElementById('solution-info');
-    info.innerHTML = `<p>Total moves: <strong>${total}</strong> | Current: <strong>${currentSolution.currentIndex}/${total}</strong></p>`;
-    
-    // Update move highlighting
-    highlightCurrentMove();
-    
-    console.log('All moves applied!');
+    // Start applying moves
+    applyNextMoveInSequence();
 }
 
 // Update the visual highlighting of the current move in the list
