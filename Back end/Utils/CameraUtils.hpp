@@ -93,5 +93,38 @@ public:
         return CubeGeometryUtils::get_abs_coordinates_by_top_left_and_top_right(target, top_left, top_right, cube);
     }
 
+    static Cubie* get_up_front_cubie(Camera* camera, Cube* cube){
+        Cubie* up_front_cubie = nullptr; // this is the cubie of concern, here we have to place white edge piece facing up
+        std::vector<Cubie *> up = CubeGeometryUtils::get_cubie_pieces_by_face(camera->get_up_face(), cube, CubieType::EDGE);
+        for (auto &cubie : up)
+        {
+            if (!cubie->check_faces_present({camera->get_up_face(), camera->get_front_face()}))
+                continue;
+            up_front_cubie = cubie;
+            break;
+        }
+        return up_front_cubie;
+    }
+
+    static Cubie* get_down_front_cubie(Camera* camera, Cube* cube){
+        Cubie* down_front_cubie = nullptr; // this is the cubie of concern, here we have to place white edge piece facing down
+        std::vector<Cubie *> down = CubeGeometryUtils::get_cubie_pieces_by_face(camera->get_down_face(), cube, CubieType::EDGE);
+        for (auto &cubie : down)
+        {
+            if (!cubie->check_faces_present({camera->get_down_face(), camera->get_front_face()}))
+                continue;
+            down_front_cubie = cubie;
+            break;
+        }
+        return down_front_cubie;
+    }
+
+    static Color get_face_color(Camera* camera, Cube* cube, FaceEnum face){
+        std::vector<Cubie*> face_middle = CubeGeometryUtils::get_cubie_pieces_by_face(face, cube, CubieType::MIDDLE);
+        if(face_middle.empty())
+            return Color::EMPTY;
+        return face_middle[0]->get_color_from_face(face);
+    }
+
 };
 

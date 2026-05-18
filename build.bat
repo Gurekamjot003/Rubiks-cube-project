@@ -42,4 +42,32 @@ if errorlevel 1 (
 echo.
 echo --- Web Build Finished Successfully! ---
 echo Output: RubiksCube.js and RubiksCube.wasm
+
+:: 5. COPY NEW FILES TO FRONT END FOLDER
+echo.
+echo --- Copying RubiksCube.js and RubiksCube.wasm to Front end ---
+
+:: Go back to the project root
+cd ..
+
+:: Delete old files from Front end
+if exist "Front end\RubiksCube.js" (
+    echo Deleting old RubiksCube.js...
+    del "Front end\RubiksCube.js"
+)
+
+if exist "Front end\RubiksCube.wasm" (
+    echo Deleting old RubiksCube.wasm...
+    del "Front end\RubiksCube.wasm"
+)
+
+:: Copy new files to Front end
+echo Copying new RubiksCube.js...
+copy "build-web\RubiksCube.js" "Front end\RubiksCube.js" >nul
+
+echo Copying new RubiksCube.wasm...
+copy "build-web\RubiksCube.wasm" "Front end\RubiksCube.wasm" >nul
+
+echo --- Files successfully copied to Front end! ---
+
 pause

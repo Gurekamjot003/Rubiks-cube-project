@@ -420,9 +420,20 @@ function solve() {
         const solutionJSON = cubeEngine.get_solution_JSON(algo);
         const solution = JSON.parse(solutionJSON);
         
-        // Store the solution moves globally
-        currentSolution.moves = solution.moves;
+        // Split moves on spaces to ensure each move is individual
+        const allMoves = [];
+        solution.moves.forEach(moveStr => {
+            const splitMoves = moveStr.trim().split(/\s+/);
+            allMoves.push(...splitMoves);
+        });
+        
+        // Store the solution moves globally (with split moves)
+        currentSolution.moves = allMoves;
         currentSolution.currentIndex = 0;
+        
+        // Update the solution object with split moves for display
+        solution.moves = allMoves;
+        solution.moveCount = allMoves.length;
         
         console.log(`Solution found with ${solution.moveCount} moves`);
         displaySolution(solution);
