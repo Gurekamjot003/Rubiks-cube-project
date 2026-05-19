@@ -193,3 +193,57 @@ h2 {
   font-weight: bold;
   border: 2px solid #88ecff;
 }
+
+/* Hidden class - hides elements */
+.hidden {
+  display: none;
+}
+
+/* Speed Control Styling */
+.speed-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background-color: #3a3f4b;
+  border-radius: 4px;
+  margin: 10px 0;
+}
+
+.speed-display {
+  min-width: 60px;
+  text-align: center;
+  padding: 8px 12px;
+  background-color: #2a2e35;
+  border: 1px solid #4a4f5b;
+  border-radius: 4px;
+  font-weight: bold;
+  color: #61dafb;
+}
+
+.speed-control button {
+  padding: 8px 12px;
+  flex: 0;
+}
+
+.custom-moves-input {
+  margin: 10px 0;
+}
+
+.custom-moves-input input {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #4a4f5b;
+  border-radius: 4px;
+  background-color: #3a3f4b;
+  color: #f0f0f0;
+  width: 100%;
+}
+
+.stop-button {
+  background-color: #ff6b6b !important;
+}
+
+.stop-button:hover {
+  background-color: #ff8787 !important;
+}

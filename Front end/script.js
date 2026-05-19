@@ -26,6 +26,12 @@ let currentSolution = {
     currentIndex: 0
 };
 
+// Global speed control (1 = normal speed, 2 = 2x speed, 0.5 = half speed)
+let moveSpeed = 1;
+
+// Global flag to stop automatic moves
+let stopAutomoves = false;
+
 // ==================== PAGE INITIALIZATION ====================
 // Wait for the HTML page to fully load before running any code
 // This ensures all HTML elements are ready to be accessed
@@ -94,6 +100,32 @@ function startApp() {
     document.getElementById('applyNextMoveButton').addEventListener('click', applyNextMove);
     document.getElementById('applyAllMovesButton').addEventListener('click', applyAllMoves);
     document.getElementById('closeSolutionButton').addEventListener('click', closeSolution);
+    
+    // Speed control buttons
+    document.getElementById('speedIncreaseButton').addEventListener('click', increaseSpeed);
+    document.getElementById('speedDecreaseButton').addEventListener('click', decreaseSpeed);
+    
+    // Custom moves and stop buttons
+    document.getElementById('applyCustomMovesButton').addEventListener('click', applyCustomMoves);
+    document.getElementById('stopButton').addEventListener('click', stopMoves);
+    
+    // Allow pressing Enter to apply custom moves
+    document.getElementById('customMovesInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            applyCustomMoves();
+        }
+    });
+    
+    // Keyboard shortcuts for speed control
+    document.addEventListener('keydown', (e) => {
+        if (e.key === '+' || e.key === '=') {
+            e.preventDefault();
+            increaseSpeed();
+        } else if (e.key === '-' || e.key === '_') {
+            e.preventDefault();
+            decreaseSpeed();
+        }
+    });
 
     // Keyboard: allow pressing Enter to apply a move (instead of clicking the button)
     document.getElementById('moveInput').addEventListener('keydown', (e) => {
@@ -290,6 +322,9 @@ function applySingleMoveWithAnimation(moveToken, callback) {
     }
 
     const cubeSize = parseInt(document.getElementById('cubeSizeInput').value);
+    // Calculate animation duration based on move speed
+    // Higher speed = shorter duration (inversely proportional)
+    const adjustedDuration = MOVE_ANIMATION_DURATION / moveSpeed;
 
     try {
         if (isViewRotationMove(moveToken)) {
@@ -298,7 +333,7 @@ function applySingleMoveWithAnimation(moveToken, callback) {
             const expandedMoves = expandViewRotationMove(moveToken, cubeSize);
 
             // Animate with simultaneous flag
-            animateSequence(animations, MOVE_ANIMATION_DURATION, () => {
+            animateSequence(animations, adjustedDuration, () => {
                 // Apply all layer moves that make up this view rotation
                 for (const layerMove of expandedMoves) {
                     cubeEngine.apply_move(layerMove);
@@ -318,7 +353,7 @@ function applySingleMoveWithAnimation(moveToken, callback) {
                 const animations = JSON.parse(infoJSON);
 
                 // Animate the move on screen
-                animateSequence(animations.slice(), MOVE_ANIMATION_DURATION, () => {
+                animateSequence(animations.slice(), adjustedDuration, () => {
                     // After animation is done, update the internal cube state in C++
                     cubeEngine.apply_move(moveToken);
 
@@ -484,18 +519,18 @@ function applyNextMove() {
     const move = currentSolution.moves[currentSolution.currentIndex];
     console.log(`Applying move ${currentSolution.currentIndex + 1}: ${move}`);
     
+    // Increment the index before animation (so visual highlighting is immediate)
+    currentSolution.currentIndex++;
+    
+    // Update display immediately (before animation)
+    const total = currentSolution.moves.length;
+    const info = document.getElementById('solution-info');
+    info.innerHTML = `<p>Total moves: <strong>${total}</strong> | Current: <strong>${currentSolution.currentIndex}/${total}</strong></p>`;
+    highlightCurrentMove();
+    
     // Apply the move with animation using the unified function
     applySingleMoveWithAnimation(move, () => {
-        // Increment the index after animation completes
-        currentSolution.currentIndex++;
-        
-        // Update the solution display with progress
-        const total = currentSolution.moves.length;
-        const info = document.getElementById('solution-info');
-        info.innerHTML = `<p>Total moves: <strong>${total}</strong> | Current: <strong>${currentSolution.currentIndex}/${total}</strong></p>`;
-        
-        // Update move highlighting
-        highlightCurrentMove();
+        // Animation complete - display already updated above
     });
 }
 
@@ -505,23 +540,39 @@ function applyAllMoves() {
     
     console.log(`Applying all ${currentSolution.moves.length} moves...`);
     
+    stopAutomoves = false;
+    document.getElementById('stopButton').classList.remove('hidden');
+    
     let moveIndex = currentSolution.currentIndex;
     
     // Function to apply moves sequentially with animation
     function applyNextMoveInSequence() {
-        if (moveIndex >= currentSolution.moves.length) {
-            // All moves applied
+        if (stopAutomoves || moveIndex >= currentSolution.moves.length) {
+            // All moves applied or stopped
             currentSolution.currentIndex = moveIndex;
             const total = currentSolution.moves.length;
             const info = document.getElementById('solution-info');
             info.innerHTML = `<p>Total moves: <strong>${total}</strong> | Current: <strong>${currentSolution.currentIndex}/${total}</strong></p>`;
             highlightCurrentMove();
-            console.log('All moves applied!');
+            document.getElementById('stopButton').classList.add('hidden');
+            stopAutomoves = false;
+            if (!stopAutomoves) {
+                console.log('All moves applied!');
+            } else {
+                console.log('Moves stopped');
+            }
             return;
         }
         
         const move = currentSolution.moves[moveIndex];
         moveIndex++;
+        currentSolution.currentIndex = moveIndex; // Update immediately for real-time display
+        
+        // Update display immediately (before animation)
+        const total = currentSolution.moves.length;
+        const info = document.getElementById('solution-info');
+        info.innerHTML = `<p>Total moves: <strong>${total}</strong> | Current: <strong>${currentSolution.currentIndex}/${total}</strong></p>`;
+        highlightCurrentMove();
         
         // Apply the move with animation
         applySingleMoveWithAnimation(move, () => {
@@ -557,4 +608,108 @@ function closeSolution() {
     document.getElementById('solution-panel').style.display = 'none';
     currentSolution.moves = [];
     currentSolution.currentIndex = 0;
+    stopAutomoves = false;
+    document.getElementById('stopButton').classList.add('hidden');
+}
+
+// ==================== SPEED CONTROL ====================
+// Speed options: 0.25x, 0.5x, 0.75x, 1x, 2x, 4x, 8x, 16x
+const SPEED_OPTIONS = [0.25, 0.5, 0.75, 1, 2, 4, 8, 16];
+
+// Increase the move speed
+function increaseSpeed() {
+    const currentIndex = SPEED_OPTIONS.indexOf(moveSpeed);
+    if (currentIndex < SPEED_OPTIONS.length - 1) {
+        moveSpeed = SPEED_OPTIONS[currentIndex + 1];
+        updateSpeedDisplay();
+    }
+}
+
+// Decrease the move speed
+function decreaseSpeed() {
+    const currentIndex = SPEED_OPTIONS.indexOf(moveSpeed);
+    if (currentIndex > 0) {
+        moveSpeed = SPEED_OPTIONS[currentIndex - 1];
+        updateSpeedDisplay();
+    }
+}
+
+// Update the speed display text
+function updateSpeedDisplay() {
+    const display = document.getElementById('speedDisplay');
+    // Format speed to remove unnecessary decimal places
+    const formatted = moveSpeed < 1 ? moveSpeed.toFixed(2) : moveSpeed.toString();
+    display.textContent = formatted + 'x';
+}
+
+// Apply custom number of moves
+function applyCustomMoves() {
+    const input = document.getElementById('customMovesInput');
+    const numMoves = parseInt(input.value);
+    
+    if (isNaN(numMoves) || numMoves < 1) {
+        alert('Please enter a valid number of moves');
+        return;
+    }
+    
+    if (currentSolution.moves.length === 0) {
+        alert('No solution loaded');
+        return;
+    }
+    
+    if (currentSolution.currentIndex >= currentSolution.moves.length) {
+        alert('All moves have been applied!');
+        return;
+    }
+    
+    console.log(`Applying ${numMoves} moves...`);
+    stopAutomoves = false;
+    document.getElementById('stopButton').classList.remove('hidden');
+    
+    let moveIndex = currentSolution.currentIndex;
+    let movesApplied = 0;
+    
+    // Function to apply moves sequentially with speed control
+    function applyNextMoveInCustomSequence() {
+        if (stopAutomoves || moveIndex >= currentSolution.moves.length || movesApplied >= numMoves) {
+            // Finished applying custom moves
+            currentSolution.currentIndex = moveIndex;
+            const total = currentSolution.moves.length;
+            const info = document.getElementById('solution-info');
+            info.innerHTML = `<p>Total moves: <strong>${total}</strong> | Current: <strong>${currentSolution.currentIndex}/${total}</strong></p>`;
+            highlightCurrentMove();
+            document.getElementById('stopButton').classList.add('hidden');
+            stopAutomoves = false;
+            input.value = '';
+            console.log(`Applied ${movesApplied} moves!`);
+            return;
+        }
+        
+        const move = currentSolution.moves[moveIndex];
+        moveIndex++;
+        movesApplied++;
+        currentSolution.currentIndex = moveIndex; // Update immediately for real-time display
+        
+        // Update display immediately (before animation)
+        const total = currentSolution.moves.length;
+        const info = document.getElementById('solution-info');
+        info.innerHTML = `<p>Total moves: <strong>${total}</strong> | Current: <strong>${currentSolution.currentIndex}/${total}</strong></p>`;
+        highlightCurrentMove();
+        
+        // Apply the move with animation adjusted for speed
+        applySingleMoveWithAnimation(move, () => {
+            // After animation, continue with next move
+            applyNextMoveInCustomSequence();
+        });
+    }
+    
+    // Start applying moves
+    applyNextMoveInCustomSequence();
+}
+
+// Stop applying moves
+function stopMoves() {
+    stopAutomoves = true;
+    document.getElementById('stopButton').classList.add('hidden');
+    console.log('Moves stopped');
 }

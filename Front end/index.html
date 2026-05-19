@@ -63,9 +63,26 @@
                 <h2>Solution</h2>
                 <div id="solution-info"></div>
                 <div id="solution-moves"></div>
+
+                <!-- Speed Control -->
+                <div class="speed-control">
+                    <span>Speed:</span>
+                    <button id="speedDecreaseButton">−</button>
+                    <div class="speed-display" id="speedDisplay">1x</div>
+                    <button id="speedIncreaseButton">+</button>
+                </div>
+
+                <!-- Custom Moves Input -->
+                <div class="custom-moves-input control-group">
+                    <input type="number" id="customMovesInput" placeholder="Apply N moves" min="1"
+                        title="Enter number of moves to apply">
+                    <button id="applyCustomMovesButton">Apply N</button>
+                </div>
+
                 <div class="control-group">
                     <button id="applyNextMoveButton">Apply Next Move</button>
                     <button id="applyAllMovesButton">Apply All Moves</button>
+                    <button id="stopButton" class="stop-button hidden">Stop</button>
                     <button id="closeSolutionButton">Close</button>
                 </div>
             </div>
