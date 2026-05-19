@@ -49,40 +49,71 @@ public:
         // step 3 second layer
         second_layer();
 
-        // step 4 second layer edges
+        // step 4 top cross
+        top_cross();
 
-        // step 5 yellow cross
+        // step 5 corner positioning
 
-        // step 6 position yellow corners
+        // step 6 corner twisting
 
-        // step 7 orient yellow corners
+        // step 7 edge positioning - solved cube
 
         return moves;
     }
 
-    bool test_daisy(){
-        std::vector<Cubie*> up_edges = CubeGeometryUtils::get_cubies_by_face_and_type(camera->get_up_face(), cube, CubieType::EDGE);
-        for(auto& cubie: up_edges){
-            if(cubie->get_color_from_face(camera->get_up_face()) != Color::WHITE){
-                return false;
-            }
+    bool test_top_cross(){
+
+        Color up_color = CameraUtils::get_face_color(camera, cube, camera->get_up_face());
+        std::vector<Cubie*> up_face_cubies = CubeGeometryUtils::get_cubies_by_face_and_type(camera->get_up_face(), cube, CubieType::EDGE);
+        for(auto& cubie: up_face_cubies){
+            if(cubie->get_color_from_face(camera->get_up_face()) != up_color) return false;
         }
         return true;
     }
 
-    bool test_cross(){
-        std::vector<Cubie*> down_edges = CubeGeometryUtils::get_cubies_by_face_and_type(camera->get_down_face(), cube, CubieType::EDGE);
-        for(auto& cubie: down_edges){
-            std::map<FaceEnum, Color> colors = cubie->get_colors();
-            for(auto& [face, color]: colors){
-                if(color != CameraUtils::get_face_color(camera, cube, face)){
-                    return false;
+    void top_cross(){
+
+        Color up_color = CameraUtils::get_face_color(camera, cube, camera->get_up_face());
+        std::vector<Cubie*> up_face_cubies = CubeGeometryUtils::get_cubies_by_face_and_type(camera->get_up_face(), cube, CubieType::EDGE);
+
+        while(!test_top_cross()){
+            // we want any of the 3 cases - reference to jperm step 4
+            
+            // case 1 only single middle piece all edge pieces incorrect
+
+            // case 2 2 pieces correct
+            std::vector<Cubie*> cubies_with_correct_edge_pieces;
+            for(auto& cubie: up_face_cubies){
+                if(cubie->get_color_from_face(camera->get_up_face()) == up_color){
+                    cubies_with_correct_edge_pieces.push_back(cubie);
                 }
             }
+
+            if(cubies_with_correct_edge_pieces.size() == 1 or cubies_with_correct_edge_pieces.size() == 3){
+                throw std::runtime_error("Error in top cross algorithm, there should be either 0 or 2 edge pieces with correct up face color. The cube is unsolvable or there is some error in previous steps.");
+            }
+            // we have to make top face such that correct are at left and back or left and right
+            if(cubies_with_correct_edge_pieces.size() == 2){
+                // if the correct pieces are at left and back or left and right, then we will apply move to make them at left and back and then apply move to solve the cross
+                while(true){
+                    if(cubies_with_correct_edge_pieces[1]->check_faces_present({camera->get_left_face()})){
+                        std::swap(cubies_with_correct_edge_pieces[0], cubies_with_correct_edge_pieces[1]);
+                    }
+                        
+                    if(cubies_with_correct_edge_pieces[0]->check_faces_present({camera->get_left_face()}) and (cubies_with_correct_edge_pieces[1]->check_faces_present({camera->get_right_face()})) or (cubies_with_correct_edge_pieces[1]->check_faces_present({camera->get_back_face()}))){
+                        break;
+                    }
+                    
+                    apply_move("U");
+                }
+                
+            }
+
+            apply_move("F R U R' U' F'");
         }
-        return true;
     }
 
+    
     void move_sequence_for_top_to_right_move(){
         apply_move("U");
         ruru();
@@ -209,7 +240,6 @@ public:
         
     }
 
-
     void white_cross_from_daisy()
     {
         // find white edge pieces in daisy and move them to correct position in down face
@@ -333,4 +363,29 @@ public:
             return;
         }
     }
+
+    bool test_daisy(){
+        std::vector<Cubie*> up_edges = CubeGeometryUtils::get_cubies_by_face_and_type(camera->get_up_face(), cube, CubieType::EDGE);
+        for(auto& cubie: up_edges){
+            if(cubie->get_color_from_face(camera->get_up_face()) != Color::WHITE){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool test_cross(){
+        std::vector<Cubie*> down_edges = CubeGeometryUtils::get_cubies_by_face_and_type(camera->get_down_face(), cube, CubieType::EDGE);
+        for(auto& cubie: down_edges){
+            std::map<FaceEnum, Color> colors = cubie->get_colors();
+            for(auto& [face, color]: colors){
+                if(color != CameraUtils::get_face_color(camera, cube, face)){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+
 };
