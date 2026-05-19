@@ -219,7 +219,7 @@ public:
         for(auto& plane: cubies){
             for(auto& row: plane){
                 for(auto& cubie_ptr: row){
-                    if(cubie_ptr && cubie_ptr->check_colors_present(colors)){
+                    if(cubie_ptr && cubie_ptr->check_colors_match(colors)){
                         ans.push_back(cubie_ptr.get());
                     }
                 }

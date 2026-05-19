@@ -46,7 +46,8 @@ public:
         // step 2 first layer
         first_layer();
 
-        // step 3 first layer corners
+        // step 3 second layer
+        second_layer();
 
         // step 4 second layer edges
 
@@ -80,6 +81,78 @@ public:
             }
         }
         return true;
+    }
+
+    void move_sequence_for_top_to_right_move(){
+        apply_move("U");
+        ruru();
+        apply_move("y");
+        lulu();
+        apply_move("y'");
+        apply_move("U'");
+    }
+
+    void move_sequence_for_top_to_left_move(){
+        apply_move("U'");
+        lulu();
+        apply_move("y'");
+        ruru();
+        apply_move("y");
+        apply_move("U");
+    }
+
+    void second_layer(){
+        for(int side = 0; side<4; side++){
+            Color front_color = CameraUtils::get_face_color(camera, cube, camera->get_front_face());
+            Color right_color = CameraUtils::get_face_color(camera, cube, camera->get_right_face());
+            Cubie* req_cubie = CubeGeometryUtils::get_cubies_by_colors({front_color, right_color}, cube)[0];
+
+
+            //case 1 - if the required edge piece is already in second layer in its correct position
+            std::map<FaceEnum, Color> face_color_map = {
+                {camera->get_front_face(), front_color},
+                {camera->get_right_face(), right_color}
+            };
+
+            if(req_cubie->check_faces_match(face_color_map)){
+                apply_move("y");
+                continue;
+            }
+
+            // case 2 - if the required edge piece is in second layer but in wrong position, then we will apply move to bring it in up face
+            if(!req_cubie->check_faces_present({camera->get_up_face()})){
+                int move_count = 0;
+                while(!req_cubie->check_faces_present({camera->get_front_face(), camera->get_right_face()})){
+                    apply_move("d");
+                    move_count++;
+                }
+                move_sequence_for_top_to_right_move();
+                while(move_count--){
+                    apply_move("d'");
+                }
+            }
+
+            // now cubie is in top layer we want it on front face of top layer
+            while(!req_cubie->check_faces_present({camera->get_front_face()})){
+                apply_move("U");
+            }
+
+            // now cubie is in front on top layer it has to be moved to right, there can be 2 cases for the position of the cubie.
+
+            // case 1 - if front color matches with front face color, then we will apply move to bring it in right face
+            if(req_cubie->get_color_from_face(camera->get_front_face()) == front_color){
+                move_sequence_for_top_to_right_move();
+            }
+            // case 2 - if right color matches with front face color, then we will apply move to bring it in left face
+            else{
+                apply_move("U' y");
+                move_sequence_for_top_to_left_move();
+                apply_move("y' U");
+            }
+
+
+            apply_move("y");
+        }
     }
 
     void first_layer(){
