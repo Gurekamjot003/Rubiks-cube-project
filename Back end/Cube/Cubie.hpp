@@ -60,6 +60,7 @@ public:
         if(face_color_map.size() != colors.size()) return false;
         for(const auto&[face, color]: face_color_map){
             if(colors.find(face) == colors.end()) return false;
+            if(colors.at(face) != color) return false;
         }
         return true;
     }
