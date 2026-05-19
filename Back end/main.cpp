@@ -21,38 +21,84 @@ int main() {
     CubeController c(3); // n*n sized cube will be formed
 
     c.display_cube();
-
+    // string moves = c.get_solve_moves();
+    // cout<<moves<<endl;
     // c.scramble_cube();
-    c.apply_move("R U R' U'"); // applying a move to test
-    c.apply_move("F R U R' U' F'"); // applying another move to test
 
-    c.display_cube();
-
-    string moves = c.get_solve_moves();
-
-    c.display_cube();
-    moves.push_back(' ');
-    vector<string> move_list;
+    // string moves = {"R U R' U x2 F2 U D D F2 U D F2 U d d F2 d' F U d F2 y d F2 y F2 y d F2 y x2"};
+    string moves = {"y y' x2 y y' x2"};
+    // string moves = {"m m' e e' s s' x2 m m' e e' s s' x2"};
     string cur;
-    for(auto &ch : moves)
+    moves.push_back(' ');
+    for(auto& move: moves)
     {
-        if(ch == ' ')
+        if(move == ' ')
         {
             if(!cur.empty())
-                move_list.push_back(cur);
+            {
+                cout << "Applying move: " << cur << endl;
+                c.apply_move(cur);
+                c.display_cube();
+            }
             cur.clear();
         }
         else
         {
-            cur.push_back(ch);
+            cur.push_back(move);
         }
     }
-    for(auto& move: move_list)
-    {
-        cout << "Applying move: " << move << endl;
-        c.apply_move(move);
-        c.display_cube();
-    }
+
+    c.apply_move("R U R' U");
+    c.display_cube();
+    c.apply_move("x2 F2 U D");
+    c.display_cube();
+    c.apply_move("D F2 U D");
+    c.display_cube();
+    c.apply_move("F2 U d d");
+    c.display_cube();
+    c.apply_move("F2 d' F U");
+    c.display_cube();
+    c.apply_move("d F2 y d");
+    c.display_cube();
+    c.apply_move("F2 y F2 y");
+    c.display_cube();
+    c.apply_move("d F2 y x2");
+    c.display_cube();
+    c.apply_move("y");
+    c.display_cube();
+    c.apply_move("y'");
+    c.display_cube();
+
+    c.apply_move("R U R' U"); // applying a move to test
+    // c.apply_move("F R U R' U' F'"); // applying another move to test
+
+    c.display_cube();
+
+    // string moves = c.get_solve_moves();
+
+    // c.display_cube();
+    // moves.push_back(' ');
+    // vector<string> move_list;
+    // string cur;
+    // for(auto &ch : moves)
+    // {
+    //     if(ch == ' ')
+    //     {
+    //         if(!cur.empty())
+    //             move_list.push_back(cur);
+    //         cur.clear();
+    //     }
+    //     else
+    //     {
+    //         cur.push_back(ch);
+    //     }
+    // }
+    // for(auto& move: move_list)
+    // {
+    //     cout << "Applying move: " << move << endl;
+    //     c.apply_move(move);
+    //     c.display_cube();
+    // }
     
 
     while (true) {

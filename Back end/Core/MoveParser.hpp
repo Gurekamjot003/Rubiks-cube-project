@@ -19,8 +19,7 @@ class MoveParser
             FaceEnum rotating_face = CameraUtils::get_face_enum_from_rotation_move(token[0], camera);
             Axis axis = CubeGeometryUtils::get_axis_from_face(rotating_face);
             Direction direction = CubeGeometryUtils::get_direction_from_move(token.back());
-            int relative_num_rotations = CubeGeometryUtils::get_relative_num_rotations(direction);
-            int num_rotations = 4 - relative_num_rotations; // camera rotates opposite to cube
+            int num_rotations = CameraUtils::get_num_rotations(direction, rotating_face);
             return std::make_unique<ViewRotateCommand>(axis, num_rotations);
         }
     };

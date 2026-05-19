@@ -53,6 +53,28 @@ public:
                 camera->get_front_face()
             };
         }
+        else if(required_face == camera->get_left_face()){
+            faces_to_search = {
+                camera->get_left_face(),
+                camera->get_up_face(),
+                camera->get_back_face()
+            };
+        }
+        else if(required_face == camera->get_down_face()){
+            faces_to_search = {
+                camera->get_down_face(),
+                camera->get_front_face(),
+                camera->get_left_face()
+            };
+        }
+        else if(required_face == camera->get_back_face()){
+            faces_to_search = {
+                camera->get_back_face(),
+                camera->get_up_face(),
+                camera->get_right_face()
+            };
+        }
+        
 
         return cube->get_corner_piece_coordinate_with_required_faces(axis, layer, faces_to_search);
     }
@@ -81,6 +103,27 @@ public:
                 camera->get_right_face(),
                 camera->get_up_face(),
                 CubeGeometryUtils::get_opposite_face(camera->get_front_face())
+            };
+        }
+        else if(required_face == camera->get_left_face()){
+            faces_to_search = {
+                camera->get_left_face(),
+                camera->get_up_face(),
+                camera->get_front_face()
+            };
+        }
+        else if(required_face == camera->get_down_face()){
+            faces_to_search = {
+                camera->get_down_face(),
+                camera->get_front_face(),
+                camera->get_right_face()
+            };
+        }
+        else if(required_face == camera->get_back_face()){
+            faces_to_search = {
+                camera->get_back_face(),
+                camera->get_up_face(),
+                camera->get_left_face()
             };
         }
 

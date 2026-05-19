@@ -28,17 +28,17 @@ public:
     {
         this->cube = cube;
         this->camera = camera;
-        CameraDisplayer displayer(camera);
+        displayer = new CameraDisplayer(camera);
 
         moves.clear();
         // apply lbl algo
 
         // first we will find white center and put it in the down face and yellow will automatically be on the up face.
-        white_down(displayer);
+        white_down();
 
-        displayer.display(cube);
+        // displayer.display(cube);
         // step 1 white cross
-        white_cross(displayer);
+        white_cross();
 
         // step 2 cross
 
@@ -55,32 +55,62 @@ public:
         return moves;
     }
 
-    void white_cross(CameraDisplayer &displayer)
+    bool test_daisy(){
+        std::vector<Cubie*> up_edges = CubeGeometryUtils::get_cubie_pieces_by_face(camera->get_up_face(), cube, CubieType::EDGE);
+        for(auto& cubie: up_edges){
+            if(cubie->get_color_from_face(camera->get_up_face()) != Color::WHITE){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool test_cross(){
+        std::vector<Cubie*> down_edges = CubeGeometryUtils::get_cubie_pieces_by_face(camera->get_down_face(), cube, CubieType::EDGE);
+        for(auto& cubie: down_edges){
+            std::map<FaceEnum, Color> colors = cubie->get_colors();
+            for(auto& [face, color]: colors){
+                if(color != CameraUtils::get_face_color(camera, cube, face)){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    void white_cross()
     {
         // step 1 daisy
-        daisy(displayer);
+        daisy();
+        if(!test_daisy()) std::cout<<"Error in daisy step\n";
 
         // step 2 white cross from daisy
+        white_cross_from_daisy();
+        if(!test_cross()) std::cout<<"Error in cross step\n";
 
+        apply_move("x2"); // rotate the cube to have white face in up face for next steps
+        
     }
 
     
 
-    void white_cross_from_daisy(CameraDisplayer &displayer)
+    void white_cross_from_daisy()
     {
         // find white edge pieces in daisy and move them to correct position in down face
         for (int temp = 0; temp < 4; temp++)
         {
             Cubie *up_front_cubie = CameraUtils::get_up_front_cubie(camera, cube);
             Color front_color = up_front_cubie->get_color_from_face(camera->get_front_face());
-            for(int t = 0; t<4; t++){
-
+            while(front_color != CameraUtils::get_face_color(camera, cube, camera->get_front_face())){
+                apply_move("d");
             }
+            apply_move("F2");
+            apply_move("y");
         }
             
     }
 
-    void daisy(CameraDisplayer &displayer)
+    void daisy()
     {
         // find white edge pieces and move them to up face around yellow center
         for (int temp = 0; temp < 4; temp++)
@@ -93,25 +123,29 @@ public:
             if (up_front_cubie && up_front_cubie->get_color_from_face(camera->get_up_face()) == Color::WHITE)
             {
                 apply_move("U");
-                displayer.display(cube);
                 continue;
             }
 
             // case 2 - white edge piece is in down face, we will apply move to bring it in up face with white color facing front and then apply move to bring it in daisy.
             std::vector<Cubie *> down = CubeGeometryUtils::get_cubie_pieces_by_face(camera->get_down_face(), cube, CubieType::EDGE);
-            Cubie *down_front_cubie = CameraUtils::get_down_front_cubie(camera, cube);
+            Cubie *down_white_cubie = nullptr;
 
-            while (down_front_cubie && !down_front_cubie->check_faces_present({camera->get_front_face()}))
-            {
-                apply_move("D");
-                displayer.display(cube);
+            for(auto& cubie: down){
+                if(cubie->get_color_from_face(camera->get_down_face()) == Color::WHITE){
+                    down_white_cubie = cubie;
+                    break;
+                }
             }
 
-            if (down_front_cubie && down_front_cubie->get_color_from_face(camera->get_down_face()) == Color::WHITE)
+            while (down_white_cubie && !down_white_cubie->check_faces_present({camera->get_front_face()}))
+            {
+                apply_move("D");
+            }
+
+            if (down_white_cubie && down_white_cubie->get_color_from_face(camera->get_down_face()) == Color::WHITE)
             {
                 apply_move("F2");
                 apply_move("U");
-                displayer.display(cube);
                 continue;
             }
 
@@ -132,7 +166,6 @@ public:
                 if (!front_cubie)
                 {
                     apply_move("d");
-                    displayer.display(cube);    
                 }
             }
 
@@ -156,11 +189,11 @@ public:
 
             // next white edge piece
             apply_move("U");
-            displayer.display(cube);
+            // displayer.display(cube);
         }
     }
 
-    void white_down(CameraDisplayer &displayer)
+    void white_down()
     {
         // find white center
         if(CameraUtils::get_face_color(camera, cube, camera->get_up_face()) == Color::WHITE){
