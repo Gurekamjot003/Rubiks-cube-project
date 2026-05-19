@@ -37,10 +37,14 @@ public:
         white_down();
 
         // displayer.display(cube);
+
+        // taking step by step solution reference from jperm
+        // https://jperm.net/3x3
         // step 1 white cross
         white_cross();
 
-        // step 2 cross
+        // step 2 first layer
+        first_layer();
 
         // step 3 first layer corners
 
@@ -56,7 +60,7 @@ public:
     }
 
     bool test_daisy(){
-        std::vector<Cubie*> up_edges = CubeGeometryUtils::get_cubie_pieces_by_face(camera->get_up_face(), cube, CubieType::EDGE);
+        std::vector<Cubie*> up_edges = CubeGeometryUtils::get_cubies_by_face_and_type(camera->get_up_face(), cube, CubieType::EDGE);
         for(auto& cubie: up_edges){
             if(cubie->get_color_from_face(camera->get_up_face()) != Color::WHITE){
                 return false;
@@ -66,7 +70,7 @@ public:
     }
 
     bool test_cross(){
-        std::vector<Cubie*> down_edges = CubeGeometryUtils::get_cubie_pieces_by_face(camera->get_down_face(), cube, CubieType::EDGE);
+        std::vector<Cubie*> down_edges = CubeGeometryUtils::get_cubies_by_face_and_type(camera->get_down_face(), cube, CubieType::EDGE);
         for(auto& cubie: down_edges){
             std::map<FaceEnum, Color> colors = cubie->get_colors();
             for(auto& [face, color]: colors){
@@ -78,6 +82,48 @@ public:
         return true;
     }
 
+    void first_layer(){
+        for(int temp = 0; temp<4; temp++){
+            
+            Color down_color = CameraUtils::get_face_color(camera, cube, camera->get_down_face()),
+                  front_color = CameraUtils::get_face_color(camera, cube, camera->get_front_face()),
+                  right_color = CameraUtils::get_face_color(camera, cube, camera->get_right_face());
+                  
+            std::vector<Color> colors_req = {down_color, front_color, right_color};
+            Cubie* req_cubie = CubeGeometryUtils::get_cubies_by_colors(colors_req, cube)[0];
+            
+
+            // we have to place required corner piece to the front top right position if it is not on right & front face
+                           
+            if(req_cubie->check_faces_present({camera->get_down_face()})){
+                // if the required cubie is present in down face, then we will apply move to bring it in up face
+                int moves_applied = 0;
+                while(!req_cubie->check_faces_present({camera->get_front_face(), camera->get_right_face()})){
+                    apply_move("D");
+                    moves_applied++;
+                }
+                ruru();
+                // resetting the position
+                while(moves_applied--){
+                    apply_move("D'");
+                }
+            }
+            else{
+                // if the required cubie is present in up face, then we will apply move to bring it in correct position in first layer.
+                while(!req_cubie->check_faces_present({camera->get_front_face(), camera->get_right_face()})){
+                    apply_move("U");
+                }
+            }
+            
+
+            // now the required corner piece is in front top right position, we will apply move to place it in correct position in first layer.
+            while(req_cubie->check_faces_present({camera->get_up_face()}) or req_cubie->get_color_from_face(camera->get_down_face()) != down_color){
+                ruru();
+            }
+            apply_move("y");
+        }
+    }
+
     void white_cross()
     {
         // step 1 daisy
@@ -87,12 +133,9 @@ public:
         // step 2 white cross from daisy
         white_cross_from_daisy();
         if(!test_cross()) std::cout<<"Error in cross step\n";
-
-        apply_move("x2"); // rotate the cube to have white face in up face for next steps
         
     }
 
-    
 
     void white_cross_from_daisy()
     {
@@ -115,7 +158,7 @@ public:
         // find white edge pieces and move them to up face around yellow center
         for (int temp = 0; temp < 4; temp++)
         { // for each edge
-            std::vector<Cubie *> up = CubeGeometryUtils::get_cubie_pieces_by_face(camera->get_up_face(), cube, CubieType::EDGE);
+            std::vector<Cubie *> up = CubeGeometryUtils::get_cubies_by_face_and_type(camera->get_up_face(), cube, CubieType::EDGE);
 
             Cubie *up_front_cubie = CameraUtils::get_up_front_cubie(camera, cube);
 
@@ -127,7 +170,7 @@ public:
             }
 
             // case 2 - white edge piece is in down face, we will apply move to bring it in up face with white color facing front and then apply move to bring it in daisy.
-            std::vector<Cubie *> down = CubeGeometryUtils::get_cubie_pieces_by_face(camera->get_down_face(), cube, CubieType::EDGE);
+            std::vector<Cubie *> down = CubeGeometryUtils::get_cubies_by_face_and_type(camera->get_down_face(), cube, CubieType::EDGE);
             Cubie *down_white_cubie = nullptr;
 
             for(auto& cubie: down){
@@ -154,7 +197,7 @@ public:
 
             while (!front_cubie)
             {
-                std::vector<Cubie *> front = CubeGeometryUtils::get_cubie_pieces_by_face(camera->get_front_face(), cube, CubieType::EDGE);
+                std::vector<Cubie *> front = CubeGeometryUtils::get_cubies_by_face_and_type(camera->get_front_face(), cube, CubieType::EDGE);
                 for (auto &cubie : front)
                 {
                     if (cubie->get_color_from_face(camera->get_front_face()) == Color::WHITE)

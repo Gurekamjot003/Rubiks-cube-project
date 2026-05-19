@@ -5,7 +5,30 @@
 
 using namespace std;
 
-int main() {
+void apply_moves_one_by_one(CubeController &controller, const string &moves)
+{
+    string cur_move;
+    for (char ch : moves)
+    {
+        if (ch == ' ')
+        {
+            if (!cur_move.empty())
+            {
+                cout << "Applying move: " << cur_move << endl;
+                controller.apply_move(cur_move);
+                controller.display_cube();
+            }
+            cur_move.clear();
+        }
+        else
+        {
+            cur_move.push_back(ch);
+        }
+    }
+}
+
+int main()
+{
     cout << "\n\nWelcome to Gurekamjot's Rubik's Cube Solver! \n\n";
     cout << "Currently it is just a player and a work in progress\n";
     cout << "You can apply various moves on the cube all the moves are listed below \n\n";
@@ -19,94 +42,26 @@ int main() {
     cout << "There are other functionalities inside CubeController class you can use them too to see how the cube works.\nEnjoy\n\n";
 
     CubeController c(3); // n*n sized cube will be formed
+    
+    c.display_cube();
+    c.scramble_cube();
+    c.display_cube();
+    string moves = c.get_solve_moves();
 
+    apply_moves_one_by_one(c, moves);
     c.display_cube();
-    // string moves = c.get_solve_moves();
-    // cout<<moves<<endl;
-    // c.scramble_cube();
-
-    // string moves = {"R U R' U x2 F2 U D D F2 U D F2 U d d F2 d' F U d F2 y d F2 y F2 y d F2 y x2"};
-    string moves = {"y y' x2 y y' x2"};
-    // string moves = {"m m' e e' s s' x2 m m' e e' s s' x2"};
-    string cur;
-    moves.push_back(' ');
-    for(auto& move: moves)
-    {
-        if(move == ' ')
-        {
-            if(!cur.empty())
-            {
-                cout << "Applying move: " << cur << endl;
-                c.apply_move(cur);
-                c.display_cube();
-            }
-            cur.clear();
-        }
-        else
-        {
-            cur.push_back(move);
-        }
-    }
-
-    c.apply_move("R U R' U");
-    c.display_cube();
-    c.apply_move("x2 F2 U D");
-    c.display_cube();
-    c.apply_move("D F2 U D");
-    c.display_cube();
-    c.apply_move("F2 U d d");
-    c.display_cube();
-    c.apply_move("F2 d' F U");
-    c.display_cube();
-    c.apply_move("d F2 y d");
-    c.display_cube();
-    c.apply_move("F2 y F2 y");
-    c.display_cube();
-    c.apply_move("d F2 y x2");
-    c.display_cube();
-    c.apply_move("y");
-    c.display_cube();
-    c.apply_move("y'");
-    c.display_cube();
-
-    c.apply_move("R U R' U"); // applying a move to test
-    // c.apply_move("F R U R' U' F'"); // applying another move to test
-
-    c.display_cube();
-
-    // string moves = c.get_solve_moves();
-
-    // c.display_cube();
-    // moves.push_back(' ');
-    // vector<string> move_list;
-    // string cur;
-    // for(auto &ch : moves)
-    // {
-    //     if(ch == ' ')
-    //     {
-    //         if(!cur.empty())
-    //             move_list.push_back(cur);
-    //         cur.clear();
-    //     }
-    //     else
-    //     {
-    //         cur.push_back(ch);
-    //     }
-    // }
-    // for(auto& move: move_list)
-    // {
-    //     cout << "Applying move: " << move << endl;
-    //     c.apply_move(move);
-    //     c.display_cube();
-    // }
     
 
-    while (true) {
+    while (true)
+    {
         cout << "\n\nEnter a move: ";
         string move;
-        if (!std::getline(cin, move)) break; // handle EOF / input errors
-        if (move == "-1") break;
-        if (move.empty()) continue;
+        if (!std::getline(cin, move))
+            break; // handle EOF / input errors
+        if (move == "-1")
+            break;
+        if (move.empty())
+            continue;
 
         c.apply_move(move);
         c.display_cube();

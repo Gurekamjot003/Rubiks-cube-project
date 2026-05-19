@@ -175,7 +175,7 @@ public:
         return cube->get_cubies_in_layer(axis, layer, top_left, top_right);
     }
 
-    static std::vector<Cubie *> get_cubie_pieces_by_face(FaceEnum face, Cube *cube, CubieType type)
+    static std::vector<Cubie *> get_cubies_by_face_and_type(FaceEnum face, Cube *cube, CubieType type = CubieType::ANY)
     {
 
         std::vector<std::vector<Cubie *>> cubies = get_cubies_by_face(face, cube);
@@ -184,10 +184,47 @@ public:
         {
             for (auto &cubie : row)
             {
-                if (cubie->get_type() == type)
+                if (type == CubieType::ANY || cubie->get_type() == type)
+                {
                     cubie_pieces.push_back(cubie);
+                }
             }
         }
         return cubie_pieces;
+    }
+
+    static std::vector<Cubie *> get_cubies_by_faces(const std::vector<FaceEnum> &faces, Cube *cube)
+    {
+        std::vector<Cubie *> ans;
+        auto &cubies = cube->get_all_cubies();
+        for (auto &plane : cubies)
+        {
+            for (auto &row : plane)
+            {
+                for (auto &cubie_ptr : row)
+                {
+                    if (cubie_ptr && cubie_ptr->check_faces_present(faces))
+                    {
+                        ans.push_back(cubie_ptr.get());
+                    }
+                }
+            }
+        }
+        return ans;
+    }
+
+    static std::vector<Cubie*> get_cubies_by_colors(const std::vector<Color>& colors, Cube* cube){
+        std::vector<Cubie*> ans;
+        auto& cubies = cube->get_all_cubies();
+        for(auto& plane: cubies){
+            for(auto& row: plane){
+                for(auto& cubie_ptr: row){
+                    if(cubie_ptr && cubie_ptr->check_colors_present(colors)){
+                        ans.push_back(cubie_ptr.get());
+                    }
+                }
+            }
+        }
+        return ans;
     }
 };
