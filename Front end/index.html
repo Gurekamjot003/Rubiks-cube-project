@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rubik's Cube WASM Engine</title>
     <link rel="stylesheet" href="style.css">
 
@@ -24,13 +25,14 @@
         <h1>Rubik's Cube WASM Engine</h1>
         <p>Enter the size of the cube to begin.</p>
         <div class="control-group">
-            <input type="number" id="cubeSizeInput" value="3" min="2" max="20">
+            <label for="cubeSizeInput">Cube Size:</label>
+            <input type="number" id="cubeSizeInput" value="3" min="2" max="20" title="Enter cube size between 2 and 20">
             <button id="startButton" disabled>Loading WASM...</button>
         </div>
     </div>
 
     <!-- Main Application Page (hidden by default) -->
-    <div id="main-page" style="display: none;">
+    <div id="main-page" class="hidden">
         <div id="cube-container">
             <div id="cube-box-wrapper">
                 <h2>3d rubiks cube</h2>
@@ -49,7 +51,7 @@
                 <button id="applyMoveButton">Apply Move</button>
             </div>
             <div class="control-group">
-                <select id="solverSelect">
+                <select id="solverSelect" title="Select a solving algorithm">
                     <option value="LBL">Layer-by-Layer</option>
                     <option value="CFOP">CFOP</option>
                     <option value="Kociemba">Kociemba's</option>
@@ -57,7 +59,7 @@
                 <button id="solveButton">Solve</button>
             </div>
             <!-- Solution Panel (hidden by default) -->
-            <div id="solution-panel" style="display: none;">
+            <div id="solution-panel" class="hidden">
                 <h2>Solution</h2>
                 <div id="solution-info"></div>
                 <div id="solution-moves"></div>
