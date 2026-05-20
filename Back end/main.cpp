@@ -43,8 +43,8 @@ int main()
 
     CubeController c(3); // n*n sized cube will be formed
     
-    c.display_cube();
-    c.scramble_cube();
+    // c.display_cube();
+    // c.scramble_cube();
     c.display_cube();
     string moves = c.get_solve_moves();
 

@@ -56,10 +56,63 @@ public:
         corner_positioning();
 
         // step 6 corner twisting
+        corner_twisting();
 
         // step 7 edge positioning - solved cube
+        edge_positioning();
 
         return moves;
+    }
+
+    int correct_top_edges_count(){
+        std::vector<Cubie*> up_face_cubies = CubeGeometryUtils::get_cubies_by_face_and_type(camera->get_up_face(), cube, CubieType::EDGE);
+        int count = 0;
+        for(auto& cubie: up_face_cubies){
+            if(CubeGeometryUtils::check_cubie_position(cubie, cube)){
+                count++;
+            }
+        }
+        return count;
+    }
+
+    void edge_positioning_move_sequence(){
+        ruru();
+        lulu();
+        ruru(5);
+        lulu(5);
+    }
+
+    void edge_positioning(){
+        
+        while(correct_top_edges_count() != 4){
+            if(correct_top_edges_count() == 0){
+                edge_positioning_move_sequence();
+                continue;
+            }
+            Cubie* front_top = CubeGeometryUtils::get_cubies_by_faces({camera->get_front_face(), camera->get_up_face()}, cube)[0];
+            while(!CubeGeometryUtils::check_cubie_position(front_top, cube)){
+                apply_move("y");
+                front_top = CubeGeometryUtils::get_cubies_by_faces({camera->get_front_face(), camera->get_up_face()}, cube)[0];
+            }
+            edge_positioning_move_sequence();
+        }
+    }
+
+    void corner_twisting(){
+        // we have to hold the cube with white face up and fix each yellow corner one by one
+        apply_move("x2");
+
+        Color down_color = CubeGeometryUtils::get_face_color(cube, camera->get_down_face());
+        for(int side = 0; side<4; side++){
+            Cubie* bottom_right = CubeGeometryUtils::get_cubies_by_faces({camera->get_front_face(), camera->get_right_face(), camera->get_down_face()}, cube)[0];   
+            while(bottom_right->get_color_from_face(camera->get_down_face()) != down_color){
+                ruru();
+            }
+            apply_move("D");
+        }
+
+        // make the cube upright again
+        apply_move("x2");
     }
 
     std::vector<Cubie*> correct_top_corners(){
@@ -68,7 +121,7 @@ public:
         for(auto& cubie: up_face_cubies){
             std::vector<Color> colors_req;
             for(auto&[face, color]: cubie->get_colors()){
-                colors_req.push_back(CameraUtils::get_face_color(camera, cube, face));
+                colors_req.push_back(CubeGeometryUtils::get_face_color(cube, face));
             }
             if(cubie->check_colors_match(colors_req)){
                 correct_corners.push_back(cubie);
@@ -116,7 +169,7 @@ public:
 
     bool test_top_cross(){
 
-        Color up_color = CameraUtils::get_face_color(camera, cube, camera->get_up_face());
+        Color up_color = CubeGeometryUtils::get_face_color(cube, camera->get_up_face());
         std::vector<Cubie*> up_face_cubies = CubeGeometryUtils::get_cubies_by_face_and_type(camera->get_up_face(), cube, CubieType::EDGE);
         for(auto& cubie: up_face_cubies){
             if(cubie->get_color_from_face(camera->get_up_face()) != up_color) return false;
@@ -126,7 +179,7 @@ public:
 
     void top_cross(){
 
-        Color up_color = CameraUtils::get_face_color(camera, cube, camera->get_up_face());
+        Color up_color = CubeGeometryUtils::get_face_color(cube, camera->get_up_face());
         std::vector<Cubie*> up_face_cubies = CubeGeometryUtils::get_cubies_by_face_and_type(camera->get_up_face(), cube, CubieType::EDGE);
 
         while(!test_top_cross()){
@@ -187,8 +240,8 @@ public:
 
     void second_layer(){
         for(int side = 0; side<4; side++){
-            Color front_color = CameraUtils::get_face_color(camera, cube, camera->get_front_face());
-            Color right_color = CameraUtils::get_face_color(camera, cube, camera->get_right_face());
+            Color front_color = CubeGeometryUtils::get_face_color(cube, camera->get_front_face());
+            Color right_color = CubeGeometryUtils::get_face_color(cube, camera->get_right_face());
             Cubie* req_cubie = CubeGeometryUtils::get_cubies_by_colors({front_color, right_color}, cube)[0];
 
 
@@ -242,9 +295,9 @@ public:
     void first_layer(){
         for(int temp = 0; temp<4; temp++){
             
-            Color down_color = CameraUtils::get_face_color(camera, cube, camera->get_down_face()),
-                  front_color = CameraUtils::get_face_color(camera, cube, camera->get_front_face()),
-                  right_color = CameraUtils::get_face_color(camera, cube, camera->get_right_face());
+            Color down_color = CubeGeometryUtils::get_face_color(cube, camera->get_down_face()),
+                  front_color = CubeGeometryUtils::get_face_color(cube, camera->get_front_face()),
+                  right_color = CubeGeometryUtils::get_face_color(cube, camera->get_right_face());
                   
             std::vector<Color> colors_req = {down_color, front_color, right_color};
             Cubie* req_cubie = CubeGeometryUtils::get_cubies_by_colors(colors_req, cube)[0];
@@ -300,7 +353,7 @@ public:
         {
             Cubie *up_front_cubie = CameraUtils::get_up_front_cubie(camera, cube);
             Color front_color = up_front_cubie->get_color_from_face(camera->get_front_face());
-            while(front_color != CameraUtils::get_face_color(camera, cube, camera->get_front_face())){
+            while(front_color != CubeGeometryUtils::get_face_color(cube, camera->get_front_face())){
                 apply_move("d");
             }
             apply_move("F2");
@@ -395,23 +448,23 @@ public:
     void white_down()
     {
         // find white center
-        if(CameraUtils::get_face_color(camera, cube, camera->get_up_face()) == Color::WHITE){
+        if(CubeGeometryUtils::get_face_color(cube, camera->get_up_face()) == Color::WHITE){
             apply_move("x2");
             return;
         }
-        if(CameraUtils::get_face_color(camera, cube, camera->get_front_face()) == Color::WHITE){
+        if(CubeGeometryUtils::get_face_color(cube, camera->get_front_face()) == Color::WHITE){
             apply_move("x'");
             return;
         }
-        if(CameraUtils::get_face_color(camera, cube, camera->get_back_face()) == Color::WHITE){
+        if(CubeGeometryUtils::get_face_color(cube, camera->get_back_face()) == Color::WHITE){
             apply_move("x");
             return;
         }
-        if(CameraUtils::get_face_color(camera, cube, camera->get_left_face()) == Color::WHITE){
+        if(CubeGeometryUtils::get_face_color(cube, camera->get_left_face()) == Color::WHITE){
             apply_move("z'");
             return;
         }
-        if(CameraUtils::get_face_color(camera, cube, camera->get_right_face()) == Color::WHITE){
+        if(CubeGeometryUtils::get_face_color(cube, camera->get_right_face()) == Color::WHITE){
             apply_move("z");
             return;
         }
@@ -432,7 +485,7 @@ public:
         for(auto& cubie: down_edges){
             std::map<FaceEnum, Color> colors = cubie->get_colors();
             for(auto& [face, color]: colors){
-                if(color != CameraUtils::get_face_color(camera, cube, face)){
+                if(color != CubeGeometryUtils::get_face_color(cube, face)){
                     return false;
                 }
             }

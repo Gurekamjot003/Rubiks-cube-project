@@ -162,12 +162,5 @@ public:
         return down_front_cubie;
     }
 
-    static Color get_face_color(Camera* camera, Cube* cube, FaceEnum face){
-        std::vector<Cubie*> face_middle = CubeGeometryUtils::get_cubies_by_face_and_type(face, cube, CubieType::MIDDLE);
-        if(face_middle.empty())
-            return Color::EMPTY;
-        return face_middle[0]->get_color_from_face(face);
-    }
-
 };
 

@@ -203,7 +203,7 @@ public:
             {
                 for (auto &cubie_ptr : row)
                 {
-                    if (cubie_ptr && cubie_ptr->check_faces_present(faces))
+                    if (cubie_ptr && cubie_ptr->check_all_faces_present(faces))
                     {
                         ans.push_back(cubie_ptr.get());
                     }
@@ -226,5 +226,20 @@ public:
             }
         }
         return ans;
+    }
+
+    static Color get_face_color(Cube* cube, FaceEnum face){
+        std::vector<Cubie*> face_middle = CubeGeometryUtils::get_cubies_by_face_and_type(face, cube, CubieType::MIDDLE);
+        if(face_middle.empty())
+            return Color::EMPTY;
+        return face_middle[0]->get_color_from_face(face);
+    }
+
+    static bool check_cubie_position(Cubie* cubie, Cube* cube){
+        std::map<FaceEnum, Color> colors_required;
+        for(auto&[face, color]: cubie->get_colors()){
+            colors_required[face] = CubeGeometryUtils::get_face_color(cube, face);
+        }
+        return cubie->check_faces_match(colors_required);
     }
 };
