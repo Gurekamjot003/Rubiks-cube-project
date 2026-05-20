@@ -53,6 +53,7 @@ public:
         top_cross();
 
         // step 5 corner positioning
+        corner_positioning();
 
         // step 6 corner twisting
 
@@ -60,6 +61,58 @@ public:
 
         return moves;
     }
+
+    std::vector<Cubie*> correct_top_corners(){
+        std::vector<Cubie*> up_face_cubies = CubeGeometryUtils::get_cubies_by_face_and_type(camera->get_up_face(), cube, CubieType::CORNER);
+        std::vector<Cubie*> correct_corners;
+        for(auto& cubie: up_face_cubies){
+            std::vector<Color> colors_req;
+            for(auto&[face, color]: cubie->get_colors()){
+                colors_req.push_back(CameraUtils::get_face_color(camera, cube, face));
+            }
+            if(cubie->check_colors_match(colors_req)){
+                correct_corners.push_back(cubie);
+            }
+        }
+        return correct_corners;
+    }
+
+    void corner_positioning_move_sequence(){
+        ruru(3);
+        apply_move("y");
+        lulu(3);
+        apply_move("U'");
+    }
+
+    void corner_positioning(){
+        while(correct_top_corners().size() != 4){
+            if(correct_top_corners().size() != 2){
+                apply_move("U");
+                continue;
+            }
+            // now we have 2 correct corners, we will apply move to make them at right and then apply move to position the other 2 corners correctly
+            std::vector<Cubie*> correct_corners = correct_top_corners();
+            
+            bool found_left = false;
+            for(int i = 0; i<4; i++){
+                if(!(correct_corners[0]->check_faces_present({camera->get_left_face()}) && correct_corners[1]->check_faces_present({camera->get_left_face()}))){
+                    apply_move("y");
+                }
+                else{
+                    found_left = true;
+                    corner_positioning_move_sequence();
+                    break;
+                }
+            }
+
+            // if we don't find left, it is case of alternate correct
+            if(!found_left){
+                // we will apply move to make them at right and then apply move to position the other 2 corners correctly
+                corner_positioning_move_sequence();
+            }
+        }
+    }
+            
 
     bool test_top_cross(){
 
