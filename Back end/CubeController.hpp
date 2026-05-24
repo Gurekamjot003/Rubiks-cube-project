@@ -161,7 +161,7 @@ public:
 
     bool is_cube_solved()
     {
-        return cube->is_solved();
+        return CubeGeometryUtils::check_cube_solved(cube.get());
     }
 
     bool is_cube_valid()
