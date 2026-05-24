@@ -9,6 +9,7 @@
 using json = nlohmann::json;
 #endif
 #include <random>
+#include <chrono>
 
 class CubeController
 {
@@ -185,7 +186,7 @@ public:
     }
 #endif
 
-    // returns the solution moves as a JSON string
+    // returns the solution moves as a JSON string with timing information
 #ifdef EMSCRIPTEN
     std::string get_solution_JSON(std::string solverType = "LBL")
     {
@@ -195,11 +196,19 @@ public:
         Cube cube_copy(*cube);
         Camera camera_copy(*camera);
 
+        // Measure the time taken to solve the cube
+        auto start_time = std::chrono::high_resolution_clock::now();
         std::vector<std::string> moves = solver->solve(&cube_copy, &camera_copy);
+        auto end_time = std::chrono::high_resolution_clock::now();
+
+        // Calculate elapsed time in milliseconds
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+        double elapsed_ms = duration.count();
 
         json solution = json::object();
         solution["moves"] = moves;
         solution["moveCount"] = moves.size();
+        solution["solveTimeMs"] = elapsed_ms;  // Time taken to find solution (in milliseconds)
 
         return solution.dump();
     }

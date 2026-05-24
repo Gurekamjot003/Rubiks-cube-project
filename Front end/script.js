@@ -441,6 +441,23 @@ function scramble() {
     });
 }
 
+// ==================== LOADING INDICATOR HELPERS ====================
+// Show the loading overlay with spinner and text
+function showLoadingOverlay() {
+    const overlay = document.getElementById('solve-loading-overlay');
+    if (overlay) {
+        overlay.classList.remove('hidden');
+    }
+}
+
+// Hide the loading overlay
+function hideLoadingOverlay() {
+    const overlay = document.getElementById('solve-loading-overlay');
+    if (overlay) {
+        overlay.classList.add('hidden');
+    }
+}
+
 // Attempts to solve the cube using the selected algorithm
 // Called when the user clicks the "Solve" button
 function solve() {
@@ -449,11 +466,17 @@ function solve() {
     // Get the selected solver algorithm from the dropdown
     const algo = document.getElementById('solverSelect').value;
     console.log(`> Solving with ${algo}...`);
+    
+    // Show loading overlay
+    showLoadingOverlay();
 
     try {
         // Call C++ method to get solution moves as JSON
         const solutionJSON = cubeEngine.get_solution_JSON(algo);
         const solution = JSON.parse(solutionJSON);
+        
+        // Hide loading overlay once solution is found
+        hideLoadingOverlay();
         
         // Split moves on spaces to ensure each move is individual
         const allMoves = [];
@@ -470,12 +493,19 @@ function solve() {
         solution.moves = allMoves;
         solution.moveCount = allMoves.length;
         
-        console.log(`Solution found with ${solution.moveCount} moves`);
+        // Log solution info with timing if available
+        if (solution.solveTimeMs !== undefined) {
+            console.log(`Solution found with ${solution.moveCount} moves in ${solution.solveTimeMs.toFixed(2)}ms`);
+        } else {
+            console.log(`Solution found with ${solution.moveCount} moves`);
+        }
         displaySolution(solution);
         
         // Show the solution panel
         document.getElementById('solution-panel').style.display = 'block';
     } catch (error) {
+        // Hide loading overlay on error
+        hideLoadingOverlay();
         console.error('Error solving cube:', error);
         alert('Error solving cube: ' + error.message);
     }
@@ -486,8 +516,19 @@ function displaySolution(solution) {
     const solutionInfo = document.getElementById('solution-info');
     const solutionMoves = document.getElementById('solution-moves');
     
-    // Display move count and progress
-    solutionInfo.innerHTML = `<p>Total moves: <strong>${solution.moveCount}</strong> | Current: <strong>0/${solution.moveCount}</strong></p>`;
+    // Format the solve time: show in ms if less than 1000ms, otherwise convert to seconds
+    let timeDisplay = '';
+    if (solution.solveTimeMs !== undefined) {
+        if (solution.solveTimeMs < 1000) {
+            timeDisplay = `<span class="solve-time">⏱ Solved in ${solution.solveTimeMs.toFixed(2)}ms</span>`;
+        } else {
+            const seconds = (solution.solveTimeMs / 1000).toFixed(2);
+            timeDisplay = `<span class="solve-time">⏱ Solved in ${seconds}s</span>`;
+        }
+    }
+    
+    // Display move count, progress, and solve time
+    solutionInfo.innerHTML = `<p>Total moves: <strong>${solution.moveCount}</strong> | Current: <strong>0/${solution.moveCount}</strong></p>${timeDisplay}`;
     
     // Display moves as a list with styling for current move
     let movesHTML = '<div class="moves-list"><p>';
