@@ -28,7 +28,7 @@ public:
     {
         this->cube = cube;
         this->camera = camera;
-        displayer = new CameraDisplayer(camera);
+        // displayer = new CameraDisplayer(camera);
 
         moves.clear();
         // apply lbl algo
@@ -56,24 +56,24 @@ public:
         corner_positioning();
 
         // // step 6 corner twisting
-        // corner_twisting();
+        corner_twisting();
 
         // // step 7 edge positioning - solved cube
-        // edge_positioning();
+        edge_positioning();
 
         return moves;
     }
 
-    // int correct_top_edges_count(){
-    //     std::vector<Cubie*> up_face_cubies = CubeGeometryUtils::get_cubies_by_face_and_type(camera->get_up_face(), cube, CubieType::EDGE);
-    //     int count = 0;
-    //     for(auto& cubie: up_face_cubies){
-    //         if(CubeGeometryUtils::check_cubie_position(cubie, cube)){
-    //             count++;
-    //         }
-    //     }
-    //     return count;
-    // }
+    int correct_top_edges_count(){
+        std::vector<Cubie*> up_face_cubies = CubeGeometryUtils::get_cubies_by_faces_present({camera->get_up_face()}, cube, CubieType::EDGE);
+        int count = 0;
+        for(auto& cubie: up_face_cubies){
+            if(CubeGeometryUtils::check_cubie_position(cubie, cube)){
+                count++;
+            }
+        }
+        return count;
+    }
 
     void edge_positioning_move_sequence()
     {
@@ -83,38 +83,38 @@ public:
         lulu(5);
     }
 
-    // void edge_positioning(){
+    void edge_positioning(){
 
-    //     while(correct_top_edges_count() != 4){
-    //         if(correct_top_edges_count() == 0){
-    //             edge_positioning_move_sequence();
-    //             continue;
-    //         }
-    //         Cubie* front_top = CubeGeometryUtils::get_cubies_by_faces({camera->get_front_face(), camera->get_up_face()}, cube)[0];
-    //         while(!CubeGeometryUtils::check_cubie_position(front_top, cube)){
-    //             apply_move("y");
-    //             front_top = CubeGeometryUtils::get_cubies_by_faces({camera->get_front_face(), camera->get_up_face()}, cube)[0];
-    //         }
-    //         edge_positioning_move_sequence();
-    //     }
-    // }
+        while(correct_top_edges_count() != 4){
+            if(correct_top_edges_count() == 0){
+                edge_positioning_move_sequence();
+                continue;
+            }
+            Cubie* front_top = CubeGeometryUtils::get_cubies_by_faces_matching({camera->get_front_face(), camera->get_up_face()}, cube)[0];
+            while(!CubeGeometryUtils::check_cubie_position(front_top, cube)){
+                apply_move("y");
+                front_top = CubeGeometryUtils::get_cubies_by_faces_matching({camera->get_front_face(), camera->get_up_face()}, cube)[0];
+            }
+            edge_positioning_move_sequence();
+        }
+    }
 
-    // void corner_twisting(){
-    //     // we have to hold the cube with white face up and fix each yellow corner one by one
-    //     apply_move("x2");
+    void corner_twisting(){
+        // we have to hold the cube with white face up and fix each yellow corner one by one
+        apply_move("x2");
 
-    //     Color down_color = CubeGeometryUtils::get_face_color(cube, camera->get_down_face());
-    //     for(int side = 0; side<4; side++){
-    //         Cubie* bottom_right = CubeGeometryUtils::get_cubies_by_faces({camera->get_front_face(), camera->get_right_face(), camera->get_down_face()}, cube)[0];
-    //         while(bottom_right->get_color_from_face(camera->get_down_face()) != down_color){
-    //             ruru();
-    //         }
-    //         apply_move("D");
-    //     }
+        Color down_color = CubeGeometryUtils::get_face_color(cube, camera->get_down_face());
+        for(int side = 0; side<4; side++){
+            Cubie* bottom_right = CubeGeometryUtils::get_cubies_by_faces_matching({camera->get_front_face(), camera->get_right_face(), camera->get_down_face()}, cube)[0];
+            while(bottom_right->get_color_from_face(camera->get_down_face()) != down_color){
+                ruru(2);
+            }
+            apply_move("D");
+        }
 
-    //     // make the cube upright again
-    //     apply_move("x2");
-    // }
+        // make the cube upright again
+        apply_move("x2");
+    }
 
     void corner_positioning_move_sequence(){
         ruru(3);
