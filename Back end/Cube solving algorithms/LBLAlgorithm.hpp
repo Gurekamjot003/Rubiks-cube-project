@@ -28,7 +28,7 @@ public:
     {
         this->cube = cube;
         this->camera = camera;
-        // displayer = new CameraDisplayer(camera);
+        displayer = new CameraDisplayer(camera);
 
         moves.clear();
         // apply lbl algo
@@ -47,13 +47,13 @@ public:
         first_layer();
 
         // // step 3 second layer
-        // second_layer();
+        second_layer();
 
         // // step 4 top cross
-        // top_cross();
+        top_cross();
 
         // // step 5 corner positioning
-        // corner_positioning();
+        corner_positioning();
 
         // // step 6 corner twisting
         // corner_twisting();
@@ -116,178 +116,203 @@ public:
     //     apply_move("x2");
     // }
 
-    // std::vector<Cubie*> correct_top_corners(){
-    //     std::vector<Cubie*> up_face_cubies = CubeGeometryUtils::get_cubies_by_face_and_type(camera->get_up_face(), cube, CubieType::CORNER);
-    //     std::vector<Cubie*> correct_corners;
-    //     for(auto& cubie: up_face_cubies){
-    //         std::vector<Color> colors_req;
-    //         for(auto&[face, color]: cubie->get_colors()){
-    //             colors_req.push_back(CubeGeometryUtils::get_face_color(cube, face));
-    //         }
-    //         if(cubie->check_colors_match(colors_req)){
-    //             correct_corners.push_back(cubie);
-    //         }
-    //     }
-    //     return correct_corners;
-    // }
+    void corner_positioning_move_sequence(){
+        ruru(3);
+        apply_move("y");
+        lulu(3);
+        apply_move("U'");
+    }
 
-    // void corner_positioning_move_sequence(){
-    //     ruru(3);
-    //     apply_move("y");
-    //     lulu(3);
-    //     apply_move("U'");
-    // }
+    bool alternate_correct_corner_positioning(){
+        std::vector<std::vector<Cubie*>> cubies = CameraUtils::get_cubies_in_display_order(camera->get_up_face(), camera, cube);
+        std::vector<std::vector<std::vector<int>>> correct_corner_patterns = {
+            {// for alternate correct
+                {0,2,1},
+                {2,1,2},
+                {1,2,0}
+            },
+            {// for alternate correct
+                {1,2,0},
+                {2,1,2},
+                {0,2,1}  // 1 for correct position, 0 for incorrect position and 2 for don't care
+            }
+        };
 
-    // void corner_positioning(){
-    //     while(correct_top_corners().size() != 4){
-    //         if(correct_top_corners().size() != 2){
-    //             apply_move("U");
-    //             continue;
-    //         }
-    //         // now we have 2 correct corners, we will apply move to make them at right and then apply move to position the other 2 corners correctly
-    //         std::vector<Cubie*> correct_corners = correct_top_corners();
+        for(auto& pattern: correct_corner_patterns){
+            bool match = true;
+            for(int i = 0; i<3; i++){
+                for(int j = 0; j<3; j++){
+                    if(pattern[i][j] != 2 and (pattern[i][j] != CubeGeometryUtils::check_cubie_position(cubies[i][j], cube))){
+                        match = false;
+                        break;
+                    }
+                }
+                if(!match) break;
+            }
+            if(match) return true;
+        }
+        return false;
+    }
 
-    //         bool found_left = false;
-    //         for(int i = 0; i<4; i++){
-    //             if(!(correct_corners[0]->check_faces_present({camera->get_left_face()}) && correct_corners[1]->check_faces_present({camera->get_left_face()}))){
-    //                 apply_move("y");
-    //             }
-    //             else{
-    //                 found_left = true;
-    //                 corner_positioning_move_sequence();
-    //                 break;
-    //             }
-    //         }
+    bool incorrect_corner_positioning(){
+        std::vector<std::vector<Cubie*>> cubies = CameraUtils::get_cubies_in_display_order(camera->get_up_face(), camera, cube);
+        std::vector<std::vector<int>> pattern = {
+            {1,2,0},
+            {2,1,2},
+            {1,2,0}     // 1 for correct position, 0 for incorrect position and 2 for don't care
+        };
+        
+        for(int i = 0; i<3; i++){
+            for(int j = 0; j<3; j++){
+                if(pattern[i][j] != 2 and (pattern[i][j] != CubeGeometryUtils::check_cubie_position(cubies[i][j], cube))){
+                    return false;
+                }
+            }
+        }        
+        return true;
+    }
 
-    //         // if we don't find left, it is case of alternate correct
-    //         if(!found_left){
-    //             // we will apply move to make them at right and then apply move to position the other 2 corners correctly
-    //             corner_positioning_move_sequence();
-    //         }
-    //     }
-    // }
+    int correct_top_corners_count(){
+        std::vector<Cubie*> up_face_cubies = CubeGeometryUtils::get_cubies_by_faces_present({camera->get_up_face()}, cube, CubieType::CORNER);
+        int count = 0;
+        for(auto& cubie: up_face_cubies){
+            if(CubeGeometryUtils::check_cubie_position(cubie, cube)){
+                count++;
+            }
+        }
+        return count;
+    }
 
-    // bool test_top_cross(){
+    void corner_positioning(){
 
-    //     Color up_color = CubeGeometryUtils::get_face_color(cube, camera->get_up_face());
-    //     std::vector<Cubie*> up_face_cubies = CubeGeometryUtils::get_cubies_by_face_and_type(camera->get_up_face(), cube, CubieType::EDGE);
-    //     for(auto& cubie: up_face_cubies){
-    //         if(cubie->get_color_from_face(camera->get_up_face()) != up_color) return false;
-    //     }
-    //     return true;
-    // }
+        while(correct_top_corners_count() != 4){
+            if(correct_top_corners_count() != 2){
+                apply_move("U");
+                continue;
+            }
+            if(alternate_correct_corner_positioning()){
+                corner_positioning_move_sequence();
+            }
+            else if(incorrect_corner_positioning()){
+                corner_positioning_move_sequence();
+            }
+            else{
+                apply_move("y");
+            }
+        }
+    }
 
-    // void top_cross(){
+    bool test_top_cross(){
 
-    //     Color up_color = CubeGeometryUtils::get_face_color(cube, camera->get_up_face());
-    //     std::vector<Cubie*> up_face_cubies = CubeGeometryUtils::get_cubies_by_face_and_type(camera->get_up_face(), cube, CubieType::EDGE);
+        Color up_color = CubeGeometryUtils::get_face_color(cube, camera->get_up_face());
+        std::vector<Cubie*> up_face_cubies = CubeGeometryUtils::get_cubies_by_colors_present({up_color}, cube, CubieType::EDGE);
+        for(auto& cubie: up_face_cubies){
+            if(cubie->get_color_from_face(camera->get_up_face()) != up_color) return false;
+        }
+        return true;
+    }
 
-    //     while(!test_top_cross()){
-    //         // we want any of the 3 cases - reference to jperm step 4
+    bool check_top_orientation_for_yellow_cross(){
+        std::vector<std::vector<std::vector<int>>> up_face_color_pattern = {
+            {
+                {2,0,2},
+                {0,1,0},
+                {2,0,2}
+            },     // for single middle piece correct
+            {
+                {2,1,2},
+                {1,1,0},
+                {2,0,2} // for back and left
+            },
+            {
+                {2,0,2}, // for left and right
+                {1,1,1},
+                {2,0,2}
+            }
+        };
+        std::vector<std::vector<Cubie*>> up_cubies = CameraUtils::get_cubies_in_display_order(camera->get_up_face(), camera, cube);
+        Color up_color = CubeGeometryUtils::get_face_color(cube, camera->get_up_face());
+        for(auto& pattern: up_face_color_pattern){
+            bool match = true;
+            for(int i = 0; i<3; i++){
+                for(int j = 0; j<3; j++){
+                    if(pattern[i][j] != 2 and (pattern[i][j] != (up_cubies[i][j]->get_color_from_face(camera->get_up_face()) == up_color))){
+                        match = false;
+                        break;
+                    }
+                }
+            }
+            if(match) return true;
+        }
+        return false;
+    }
 
-    //         // case 1 only single middle piece all edge pieces incorrect
+    void top_cross(){
 
-    //         // case 2 2 pieces correct
-    //         std::vector<Cubie*> cubies_with_correct_edge_pieces;
-    //         for(auto& cubie: up_face_cubies){
-    //             if(cubie->get_color_from_face(camera->get_up_face()) == up_color){
-    //                 cubies_with_correct_edge_pieces.push_back(cubie);
-    //             }
-    //         }
+        while(!test_top_cross()){
+            // we want any of the 3 cases - reference to jperm step 4
 
-    //         if(cubies_with_correct_edge_pieces.size() == 1 or cubies_with_correct_edge_pieces.size() == 3){
-    //             throw std::runtime_error("Error in top cross algorithm, there should be either 0 or 2 edge pieces with correct up face color. The cube is unsolvable or there is some error in previous steps.");
-    //         }
-    //         // we have to make top face such that correct are at left and back or left and right
-    //         if(cubies_with_correct_edge_pieces.size() == 2){
-    //             // if the correct pieces are at left and back or left and right, then we will apply move to make them at left and back and then apply move to solve the cross
-    //             while(true){
-    //                 if(cubies_with_correct_edge_pieces[1]->check_faces_present({camera->get_left_face()})){
-    //                     std::swap(cubies_with_correct_edge_pieces[0], cubies_with_correct_edge_pieces[1]);
-    //                 }
+            while(!check_top_orientation_for_yellow_cross()){
+                apply_move("U");
+            }
 
-    //                 if(cubies_with_correct_edge_pieces[0]->check_faces_present({camera->get_left_face()}) and (cubies_with_correct_edge_pieces[1]->check_faces_present({camera->get_right_face()})) or (cubies_with_correct_edge_pieces[1]->check_faces_present({camera->get_back_face()}))){
-    //                     break;
-    //                 }
+            apply_move("F R U R' U' F'");
+        }
+    }
 
-    //                 apply_move("U");
-    //             }
+    void move_sequence_for_top_to_right_move(){
+        apply_move("U");
+        ruru();
+        apply_move("y");
+        lulu();
+        apply_move("y'");
+        apply_move("U'");
+    }
 
-    //         }
+    void move_sequence_for_top_to_left_move(){
+        apply_move("U'");
+        lulu();
+        apply_move("y'");
+        ruru();
+        apply_move("y");
+        apply_move("U");
+    }
 
-    //         apply_move("F R U R' U' F'");
-    //     }
-    // }
+    void second_layer(){
+        std::vector<Cubie*> edge_cubies_2nd_layer = CubeGeometryUtils::get_cubies_by_colors_not_present({Color::WHITE, Color::YELLOW}, cube);
+        for(auto& cubie: edge_cubies_2nd_layer){
 
-    // void move_sequence_for_top_to_right_move(){
-    //     apply_move("U");
-    //     ruru();
-    //     apply_move("y");
-    //     lulu();
-    //     apply_move("y'");
-    //     apply_move("U'");
-    // }
+            if(CubeGeometryUtils::check_cubie_position_strict(cubie, cube)){
+                continue;
+            }
+            
+            // bring cubie to to front and right if present in mid layer
+            if(!cubie->check_faces_present({camera->get_up_face()})){
+                while(!cubie->check_faces_present({camera->get_front_face(), camera->get_right_face()})){
+                    apply_move("y");
+                }
+                move_sequence_for_top_to_right_move();
+            }
 
-    // void move_sequence_for_top_to_left_move(){
-    //     apply_move("U'");
-    //     lulu();
-    //     apply_move("y'");
-    //     ruru();
-    //     apply_move("y");
-    //     apply_move("U");
-    // }
+            // bring the cubie to the front face
+            while(!cubie->check_faces_present({camera->get_front_face()})){
+                apply_move("y");
+            }
 
-    // void second_layer(){
-    //     for(int side = 0; side<4; side++){
-    //         Color front_color = CubeGeometryUtils::get_face_color(cube, camera->get_front_face());
-    //         Color right_color = CubeGeometryUtils::get_face_color(cube, camera->get_right_face());
-    //         Cubie* req_cubie = CubeGeometryUtils::get_cubies_by_colors({front_color, right_color}, cube)[0];
+            // now match center color with cubie
+            while(cubie->get_color_from_face(camera->get_front_face()) != CubeGeometryUtils::get_face_color(cube, camera->get_front_face())){
+                apply_move("d");
+            }
 
-    //         //case 1 - if the required edge piece is already in second layer in its correct position
-    //         std::map<FaceEnum, Color> face_color_map = {
-    //             {camera->get_front_face(), front_color},
-    //             {camera->get_right_face(), right_color}
-    //         };
-
-    //         if(req_cubie->check_faces_match(face_color_map)){
-    //             apply_move("y");
-    //             continue;
-    //         }
-
-    //         // case 2 - if the required edge piece is in second layer but in wrong position, then we will apply move to bring it in up face
-    //         if(!req_cubie->check_faces_present({camera->get_up_face()})){
-    //             int move_count = 0;
-    //             while(!req_cubie->check_faces_present({camera->get_front_face(), camera->get_right_face()})){
-    //                 apply_move("d");
-    //                 move_count++;
-    //             }
-    //             move_sequence_for_top_to_right_move();
-    //             while(move_count--){
-    //                 apply_move("d'");
-    //             }
-    //         }
-
-    //         // now cubie is in top layer we want it on front face of top layer
-    //         while(!req_cubie->check_faces_present({camera->get_front_face()})){
-    //             apply_move("U");
-    //         }
-
-    //         // now cubie is in front on top layer it has to be moved to right, there can be 2 cases for the position of the cubie.
-
-    //         // case 1 - if front color matches with front face color, then we will apply move to bring it in right face
-    //         if(req_cubie->get_color_from_face(camera->get_front_face()) == front_color){
-    //             move_sequence_for_top_to_right_move();
-    //         }
-    //         // case 2 - if right color matches with front face color, then we will apply move to bring it in left face
-    //         else{
-    //             apply_move("U' y");
-    //             move_sequence_for_top_to_left_move();
-    //             apply_move("y' U");
-    //         }
-
-    //         apply_move("y");
-    //     }
-    // }
+            // if cubie matches with right face center color, then we will apply move to bring it in right face, else we will apply move to bring it in left face
+            if(cubie->get_color_from_face(camera->get_up_face()) == CubeGeometryUtils::get_face_color(cube, camera->get_right_face())){
+                move_sequence_for_top_to_right_move();
+            }
+            else{
+                move_sequence_for_top_to_left_move();
+            }
+        }
+    }
 
     void first_layer()
     {

@@ -33,9 +33,7 @@ public:
     CameraDisplayer(Camera* camera): camera(camera){}
 
     std::vector<std::vector<Color>> face_displayer(FaceEnum face_to_display, Cube* cube){
-        Coordinate top_left = CameraUtils::get_top_left_coordinate_by_face_and_camera(face_to_display, camera, cube);
-        Coordinate top_right = CameraUtils::get_top_right_coordinate_by_face_and_camera(face_to_display, camera, cube);
-        std::vector<std::vector<Cubie*>> cubies = CubeGeometryUtils::get_cubies_by_face_in_2D(face_to_display, cube, top_left, top_right);
+        std::vector<std::vector<Cubie*>> cubies = CameraUtils::get_cubies_in_display_order(face_to_display, camera, cube);
         std::vector<std::vector<Color>> face_colors;
         for(auto& cubie_row: cubies){
             std::vector<Color> cur_row;

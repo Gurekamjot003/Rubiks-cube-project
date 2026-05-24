@@ -230,6 +230,25 @@ public:
         return cubie_pieces;
     }
 
+    static std::vector<Cubie*> get_cubies_by_colors_not_present(const std::vector<Color>& colors, Cube* cube){
+        std::vector<Cubie*> cubies = get_all_cubies(cube);
+        std::vector<Cubie*> cubie_pieces;
+        for(auto& cubie: cubies){
+            bool has_color = false;
+            for(auto& color: colors){
+                if(cubie->check_colors_present({color})){
+                    has_color = true;
+                    break;
+                }
+            }
+            if(has_color){
+                continue;
+            }
+            cubie_pieces.push_back(cubie);
+        }
+        return cubie_pieces;
+    }
+
     static std::vector<Cubie*> get_cubies_by_colors_matching(const std::vector<Color>& colors, Cube* cube){
         std::vector<Cubie*> ans;
         std::vector<Cubie*> cubies = get_all_cubies(cube);

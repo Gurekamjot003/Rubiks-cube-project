@@ -135,5 +135,11 @@ public:
         Coordinate top_right = get_top_right_coordinate_by_face_and_camera(face, camera, cube);
         return CubeGeometryUtils::get_abs_coordinates_by_top_left_and_top_right(target, top_left, top_right, cube);
     }
+
+    static std::vector<std::vector<Cubie*>> get_cubies_in_display_order(FaceEnum face, Camera* camera, Cube* cube){
+        Coordinate top_left = get_top_left_coordinate_by_face_and_camera(face, camera, cube);
+        Coordinate top_right = get_top_right_coordinate_by_face_and_camera(face, camera, cube);
+        return CubeGeometryUtils::get_cubies_by_face_in_2D(face, cube, top_left, top_right);
+    }
 };
 
