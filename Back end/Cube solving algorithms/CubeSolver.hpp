@@ -12,7 +12,7 @@ class CubeSolver{
 protected:
     Cube* cube;
     Camera* camera;
-    CameraDisplayer* displayer = nullptr;
+    // CameraDisplayer* displayer = nullptr;
     std::vector<std::string> moves; 
 public:
     CubeSolver() {}
@@ -24,10 +24,10 @@ public:
             command->execute(cube, camera);
         }
         moves.push_back(move);
-        if(displayer){
-            std::cout<<"Applied move: "<<move<<std::endl;
-            displayer->display(cube);
-        }
+        // if(displayer){
+        //     std::cout<<"Applied move: "<<move<<std::endl;
+        //     displayer->display(cube);
+        // }
     }
 
     virtual std::vector<std::string> solve(Cube* cube, Camera* camera) = 0;

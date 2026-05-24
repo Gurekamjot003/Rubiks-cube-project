@@ -248,10 +248,24 @@ public:
         return face_middle[0]->get_color_from_face(face);
     }
 
-    static bool check_cubie_position(Cubie* cubie, Cube* cube){
+    static bool check_cubie_position_strict(Cubie* cubie, Cube* cube){
         std::map<FaceEnum, Color> colors = cubie->get_colors();
         for(auto&[face, color]: colors){
             if(color != CubeGeometryUtils::get_face_color(cube, face)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static bool check_cubie_position(Cubie* cubie, Cube* cube){
+        std::set<Color> color_set;
+        for(auto&[face, color]: cubie->get_colors()){
+            Color face_color = CubeGeometryUtils::get_face_color(cube, face);
+            color_set.insert(face_color);
+        }
+        for(auto& color: color_set){
+            if(!cubie->check_colors_present({color})){
                 return false;
             }
         }
