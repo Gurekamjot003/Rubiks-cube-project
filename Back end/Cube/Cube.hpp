@@ -201,28 +201,6 @@ public:
         }   
         return true;
     }
-    
-    bool is_solved(){
-        std::map<FaceEnum, Color> face_color;
-        for(auto& i: cubies){
-            for(auto& j: i){
-                for(auto& cubie: j){
-                    auto color_map = cubie->get_colors();
-                    
-                    for(auto&[face, color]: color_map){
-                        if(face_color.count(face)){
-                            if(face_color[face] != color) return false;
-                        }
-                        else{
-                            face_color[face] = color;
-                        }
-                    }
-                }
-            }
-        }
-        return true;
-        
-    }
 
     const std::vector<std::vector<std::vector<std::unique_ptr<Cubie>>>>& get_all_cubies() const {
         return this->cubies;

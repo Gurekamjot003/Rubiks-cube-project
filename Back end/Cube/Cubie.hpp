@@ -56,21 +56,9 @@ public:
         return true;
     }
 
-    bool check_all_faces_present(const std::vector<FaceEnum>& faces) const {
+    bool check_faces_match(const std::vector<FaceEnum>& faces) const {
         if(faces.size() != colors.size()) return false;
-        for(const auto& face: faces){
-            if(colors.find(face) == colors.end()) return false;
-        }
-        return true;
-    }
-
-    bool check_faces_match(const std::map<FaceEnum, Color>& face_color_map) const {
-        if(face_color_map.size() != colors.size()) return false;
-        for(const auto&[face, color]: face_color_map){
-            if(colors.find(face) == colors.end()) return false;
-            if(colors.at(face) != color) return false;
-        }
-        return true;
+        return check_faces_present(faces);
     }
 
     bool check_colors_present(const std::vector<Color>& colors_to_check){
@@ -82,10 +70,7 @@ public:
 
     bool check_colors_match(const std::vector<Color>& colors_to_check){
         if(colors_to_check.size() != color_set.size()) return false;
-        for(auto& color: colors_to_check){
-            if(color_set.find(color) == color_set.end()) return false;
-        }
-        return true;
+        return check_colors_present(colors_to_check);
     }
 
     void set_color_by_face(FaceEnum face, Color color){
