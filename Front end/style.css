@@ -327,3 +327,137 @@ h2 {
     transform: translateY(0);
   }
 }
+
+/* ==================== THEME TOGGLE STYLES ==================== */
+.theme-toggle {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #3a3f4b;
+  border: 2px solid #61dafb;
+  color: #f0f0f0;
+  font-size: 1.2em;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  transition: all 0.3s ease;
+  padding: 0;
+}
+
+.theme-toggle:hover {
+  background-color: #4a4f5b;
+  transform: scale(1.1);
+}
+
+/* ==================== LIGHT THEME OVERRIDES ==================== */
+body.light-theme {
+  background-color: #f5f5f5;
+  color: #333333;
+}
+
+body.light-theme #entry-page {
+  background-color: #e0e5ec;
+}
+
+body.light-theme #cube-container {
+  background-color: #d1d9e6;
+}
+
+body.light-theme #cube-box-wrapper {
+  background-color: #e8eef5;
+  border-color: #cccccc;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+body.light-theme #cube-box-wrapper h2 {
+  background-color: rgba(255, 255, 255, 0.6);
+  color: #333;
+}
+
+body.light-theme #controls-panel {
+  background-color: #ffffff;
+  border-left-color: #cccccc;
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.05);
+}
+
+body.light-theme h1,
+body.light-theme h2 {
+  color: #0056b3;
+}
+
+body.light-theme .control-group input[type="text"],
+body.light-theme .control-group input[type="number"],
+body.light-theme .control-group select {
+  background-color: #f8f9fa;
+  border-color: #ced4da;
+  color: #495057;
+}
+
+body.light-theme .control-group button {
+  background-color: #007bff;
+  color: #ffffff;
+}
+
+body.light-theme .control-group button:hover {
+  background-color: #0056b3;
+}
+
+body.light-theme #startButton[disabled] {
+  background-color: #e9ecef;
+  color: #6c757d;
+}
+
+body.light-theme #solution-panel {
+  border-top-color: #007bff;
+}
+
+body.light-theme #solution-panel h2 {
+  color: #007bff;
+}
+
+body.light-theme #solution-info,
+body.light-theme .speed-control,
+body.light-theme .solve-time {
+  background-color: #f8f9fa;
+  border-left-color: #007bff;
+  color: #333;
+}
+
+body.light-theme .moves-list,
+body.light-theme .speed-display {
+  background-color: #e9ecef;
+  border-color: #ced4da;
+  color: #007bff;
+}
+
+body.light-theme .move {
+  background-color: #ffffff;
+  color: #333;
+  border-color: #ced4da;
+}
+
+body.light-theme .move.applied-move {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+body.light-theme .move.current-move {
+  background-color: #007bff;
+  color: #ffffff;
+  border-color: #0056b3;
+}
+
+body.light-theme .theme-toggle {
+  background-color: #ffffff;
+  border-color: #007bff;
+  color: #333;
+}
+
+body.light-theme .theme-toggle:hover {
+  background-color: #f8f9fa;
+}

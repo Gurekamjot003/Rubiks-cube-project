@@ -41,6 +41,33 @@ document.addEventListener('DOMContentLoaded', () => {
         // Attach click handler to the start button
         startButton.addEventListener('click', startApp);
     }
+
+    // ==================== THEME TOGGLE LOGIC ====================
+    const themeToggleBtn = document.getElementById('themeToggle');
+    if (themeToggleBtn) {
+        const iconSpan = themeToggleBtn.querySelector('.icon');
+        
+        // Check local storage for saved theme
+        const savedTheme = localStorage.getItem('cube-theme');
+        if (savedTheme === 'light') {
+            document.body.classList.add('light-theme');
+            if (iconSpan) iconSpan.textContent = '🌙';
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            document.body.classList.toggle('light-theme');
+            const isLight = document.body.classList.contains('light-theme');
+            
+            // Update icon and save preference
+            if (isLight) {
+                if (iconSpan) iconSpan.textContent = '🌙';
+                localStorage.setItem('cube-theme', 'light');
+            } else {
+                if (iconSpan) iconSpan.textContent = '☀️';
+                localStorage.setItem('cube-theme', 'dark');
+            }
+        });
+    }
 });
 
 // This callback is called after WebAssembly (C++ code) finishes loading and initializing
