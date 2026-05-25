@@ -43,6 +43,9 @@ int main()
 
     CubeController c(3); // n*n sized cube will be formed
     
+
+    c.display_cube();
+    c.set_cubie_color(FaceEnum::UP, 0, 0, Color::RED);
     c.display_cube();
     c.scramble_cube();
     c.display_cube();

@@ -85,11 +85,6 @@ public:
         else if(axis == Axis::Z) return cubies[i][j][layer].get();
         return nullptr; // Should not happen
     }
-        
-    void set_color_by_abs_coordinates(FaceEnum face, Axis axis, int layer, Coordinate coordinate, Color color){
-        Cubie* target_cubie = get_cubie(axis, layer, coordinate);
-        target_cubie->set_color_by_face(face, color);
-    }
 
     std::vector<std::vector<Cubie*>> get_cubies_in_layer(Axis axis, int layer, Coordinate top_left = Coordinate(0, 0), Coordinate top_right = Coordinate(0, 1)){
         int di = 1, end_i = n;
