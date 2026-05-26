@@ -41,25 +41,25 @@ public:
         // taking step by step solution reference from jperm
         // https://jperm.net/3x3
         // step 1 white cross
-        white_cross();
+        if(!test_step_1()) white_cross();
 
         // // step 2 first layer
-        first_layer();
+        if(!test_step_2()) first_layer();
 
         // // step 3 second layer
-        second_layer();
+        if(!test_step_3()) second_layer();
 
         // // step 4 top cross
-        top_cross();
+        if(!test_step_4()) top_cross();
 
         // // step 5 corner positioning
-        corner_positioning();
+        if(!test_step_5()) corner_positioning();
 
         // // step 6 corner twisting
-        corner_twisting();
+        if(!test_step_6()) corner_twisting();
 
         // // step 7 edge positioning - solved cube
-        edge_positioning();
+        if(!test_step_7()) edge_positioning();
 
         return moves;
     }
@@ -496,26 +496,69 @@ public:
         }
     }
 
-    // bool test_daisy(){
-    //     std::vector<Cubie*> up_edges = CubeGeometryUtils::get_cubies_by_face_and_type(camera->get_up_face(), cube, CubieType::EDGE);
-    //     for(auto& cubie: up_edges){
-    //         if(cubie->get_color_from_face(camera->get_up_face()) != Color::WHITE){
-    //             return false;
-    //         }
-    //     }
-    //     return true;
-    // }
+    bool test_step_1(){
+        std::vector<Cubie*> down_edges = CubeGeometryUtils::get_cubies_by_faces_present({camera->get_down_face()}, cube, CubieType::EDGE);
+        for(auto& cubie: down_edges){
+            if(!CubeGeometryUtils::check_cubie_position_strict(cubie, cube)){
+                return false;
+            }
+        }
+        return true;
+    }
 
-    // bool test_cross(){
-    //     std::vector<Cubie*> down_edges = CubeGeometryUtils::get_cubies_by_face_and_type(camera->get_down_face(), cube, CubieType::EDGE);
-    //     for(auto& cubie: down_edges){
-    //         std::map<FaceEnum, Color> colors = cubie->get_colors();
-    //         for(auto& [face, color]: colors){
-    //             if(color != CubeGeometryUtils::get_face_color(cube, face)){
-    //                 return false;
-    //             }
-    //         }
-    //     }
-    //     return true;
-    // }
+    bool test_step_2(){
+        std::vector<Cubie*> down_cubies = CubeGeometryUtils::get_cubies_by_faces_present({camera->get_down_face()}, cube);
+        for(auto& cubie: down_cubies){
+            if(!CubeGeometryUtils::check_cubie_position_strict(cubie, cube)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool test_step_3(){
+        std::vector<Cubie*> cubies = CubeGeometryUtils::get_all_cubies(cube);
+
+        for(auto& cubie: cubies){
+            if(!cubie->check_faces_present({camera->get_up_face()}) && !CubeGeometryUtils::check_cubie_position_strict(cubie, cube)){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool test_step_4(){
+        std::vector<Cubie*> up_edges = CubeGeometryUtils::get_cubies_by_faces_present({camera->get_up_face()}, cube, CubieType::EDGE);
+        Color up_color = CubeGeometryUtils::get_face_color(cube, camera->get_up_face());
+        for(auto& cubie: up_edges){
+            if(cubie->get_color_from_face(camera->get_up_face()) != up_color){
+                return false;
+            }
+        }
+        return test_step_3();
+    }
+
+    bool test_step_5(){
+        std::vector<Cubie*> up_corners = CubeGeometryUtils::get_cubies_by_faces_present({camera->get_up_face()}, cube, CubieType::CORNER);
+        for(auto& cubie: up_corners){
+            if(!CubeGeometryUtils::check_cubie_position(cubie, cube)){
+                return false;
+            }
+        }
+        return test_step_4();
+    }
+
+    bool test_step_6(){
+        std::vector<Cubie*> up_corners = CubeGeometryUtils::get_cubies_by_faces_present({camera->get_up_face()}, cube, CubieType::CORNER);
+        for(auto& cubie: up_corners){
+            if(!CubeGeometryUtils::check_cubie_position_strict(cubie, cube)){
+                return false;
+            }
+        }
+        return test_step_4();
+    }
+
+    bool test_step_7(){
+        return CubeGeometryUtils::check_cube_solved(cube);
+    }
 };
