@@ -44,6 +44,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ==================== THEME TOGGLE LOGIC ====================
     const themeToggleBtn = document.getElementById('themeToggle');
+    
+    function updateThemeUI(isLight) {
+        const emptyOpt = document.getElementById('emptyColorOption');
+        if (emptyOpt) {
+            emptyOpt.textContent = isLight ? "Dark Gray (Empty)" : "Light Gray (Empty)";
+        }
+        // If the cube is already initialized, we need to update its visuals
+        // so the empty cubies swap between light and dark gray
+        if (typeof cubeEngine !== 'undefined' && cubeEngine && typeof create_cube_from_json !== 'undefined') {
+            const cube_data = JSON.parse(cubeEngine.get_cube_state_JSON());
+            create_cube_from_json(cube_data);
+        }
+    }
+
     if (themeToggleBtn) {
         const iconSpan = themeToggleBtn.querySelector('.icon');
         
@@ -52,6 +66,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (savedTheme === 'light') {
             document.body.classList.add('light-theme');
             if (iconSpan) iconSpan.textContent = '🌙';
+            updateThemeUI(true);
+        } else {
+            updateThemeUI(false);
         }
 
         themeToggleBtn.addEventListener('click', () => {
@@ -66,6 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (iconSpan) iconSpan.textContent = '☀️';
                 localStorage.setItem('cube-theme', 'dark');
             }
+            
+            updateThemeUI(isLight);
         });
     }
 });

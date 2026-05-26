@@ -801,6 +801,9 @@ const SPACING = 0.1;
 // Face order: Right, Left, Up, Down, Front, Back
 // This order matches Three.js's BoxGeometry face ordering
 function create_cubie_materials(colors) {
+    const isLightMode = document.body.classList.contains('light-theme');
+    const emptyColor = isLightMode ? 0x555555 : 0xcccccc; // Dark gray for light mode, light gray for dark mode
+
     // Mapping from color character to hex color value
     const color_map = {
         'W': 0xffffff,  // White
@@ -810,7 +813,7 @@ function create_cubie_materials(colors) {
         'O': 0xffa500,  // Orange
         'Y': 0xffff00,  // Yellow
         'X': 0x333333,  // Black/Gray for internal faces
-        'E': 0xcccccc,  // Light Gray for empty external faces
+        'E': emptyColor, // Light/Dark Gray for empty external faces depending on theme
     };
 
     // Order of faces in Three.js BoxGeometry
