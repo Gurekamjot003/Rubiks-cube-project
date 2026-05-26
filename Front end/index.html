@@ -63,7 +63,7 @@
                 <input type="text" id="moveInput" placeholder="e.g., R U R' U'">
                 <button id="applyMoveButton">Apply Move</button>
             </div>
-            <div class="control-group">
+            <div class="control-group" id="solve-control-group">
                 <select id="solverSelect" title="Select a solving algorithm">
                     <option value="LBL">Layer-by-Layer</option>
                     <option value="CFOP">CFOP</option>
@@ -71,6 +71,44 @@
                 </select>
                 <button id="solveButton">Solve</button>
             </div>
+            
+            <div class="control-group">
+                <button id="editCubeButton">Edit Cube</button>
+            </div>
+
+            <!-- Color Picker Panel -->
+            <div id="color-picker-panel" class="hidden">
+                <h2>Set Cubie Color</h2>
+                <div class="control-group">
+                    <select id="colorFaceSelect" title="Select Face">
+                        <option value="UP">Up</option>
+                        <option value="DOWN">Down</option>
+                        <option value="FRONT">Front</option>
+                        <option value="BACK">Back</option>
+                        <option value="LEFT">Left</option>
+                        <option value="RIGHT">Right</option>
+                    </select>
+                    <input type="number" id="colorXInput" placeholder="X (0-index)" min="0" value="0">
+                    <input type="number" id="colorYInput" placeholder="Y (0-index)" min="0" value="0">
+                </div>
+                <div class="control-group" style="margin-top: 10px;">
+                    <select id="colorSelect" title="Select Color">
+                        <option value="WHITE">White</option>
+                        <option value="GREEN">Green</option>
+                        <option value="RED">Red</option>
+                        <option value="BLUE">Blue</option>
+                        <option value="ORANGE">Orange</option>
+                        <option value="YELLOW">Yellow</option>
+                        <option value="EMPTY">Light Gray (Empty)</option>
+                    </select>
+                    <button id="applyColorButton">Apply Color</button>
+                </div>
+                <div class="control-group" style="margin-top: 10px;">
+                    <button id="clearCubeButton" class="stop-button">Clear Cube</button>
+                    <button id="closeColorPickerButton">Close</button>
+                </div>
+            </div>
+
             <!-- Solution Panel (hidden by default) -->
             <div id="solution-panel" class="hidden">
                 <h2>Solution</h2>

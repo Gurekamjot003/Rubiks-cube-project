@@ -730,8 +730,13 @@ function create_cube_from_json(cube_data) {
     // ==================== CREATE EACH CUBIE ====================
     for (const cubie_data of cube_data.cubies) {
         // Skip internal cubies that aren't visible
-        // These are marked with colors="XXXXXX" (all hidden)
-        if (cubie_data.colors === 'XXXXXX') continue;
+        // Internal cubies are not on the surface of the cube
+        const isInternal = (
+            cubie_data.pos.x > 0 && cubie_data.pos.x < cube_data.size - 1 &&
+            cubie_data.pos.y > 0 && cubie_data.pos.y < cube_data.size - 1 &&
+            cubie_data.pos.z > 0 && cubie_data.pos.z < cube_data.size - 1
+        );
+        if (isInternal) continue;
 
         // ==================== CREATE GEOMETRY ====================
         // Create a cube shape (1×1×1)
@@ -789,6 +794,7 @@ const SPACING = 0.1;
 //   O = Orange   (0xffa500)
 //   Y = Yellow   (0xffff00)
 //   X = Hidden   (0x333333) - internal faces
+//   E = Empty    (0xcccccc) - external faces with empty color enum
 //
 // Returns: Array of 6 THREE.MeshBasicMaterial objects, one per face
 //
@@ -804,6 +810,7 @@ function create_cubie_materials(colors) {
         'O': 0xffa500,  // Orange
         'Y': 0xffff00,  // Yellow
         'X': 0x333333,  // Black/Gray for internal faces
+        'E': 0xcccccc,  // Light Gray for empty external faces
     };
 
     // Order of faces in Three.js BoxGeometry

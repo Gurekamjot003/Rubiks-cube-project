@@ -123,6 +123,22 @@ function startApp() {
     // Solve button: attempt to solve the cube (not implemented yet)
     document.getElementById('solveButton').addEventListener('click', solve);
 
+    // Apply color button
+    document.getElementById('applyColorButton').addEventListener('click', applyCubieColor);
+
+    // Edit Cube Panel Toggle Buttons
+    document.getElementById('editCubeButton').addEventListener('click', () => {
+        document.getElementById('color-picker-panel').classList.remove('hidden');
+        document.getElementById('color-picker-panel').style.display = 'block';
+    });
+    
+    document.getElementById('closeColorPickerButton').addEventListener('click', () => {
+        document.getElementById('color-picker-panel').classList.add('hidden');
+        document.getElementById('color-picker-panel').style.display = 'none';
+    });
+
+    document.getElementById('clearCubeButton').addEventListener('click', clearCubeColors);
+
     // Solution panel buttons
     document.getElementById('applyNextMoveButton').addEventListener('click', applyNextMove);
     document.getElementById('applyAllMovesButton').addEventListener('click', applyAllMoves);
@@ -253,6 +269,20 @@ function initCube() {
         // This object handles all the cube logic (moves, state, etc.)
         cubeEngine = new Module.CubeController(n);
         console.log(`Created ${n}x${n}x${n} Cube!`);
+
+        // Show/hide solve controls based on cube size
+        const solveGroup = document.getElementById('solve-control-group');
+        if (solveGroup) {
+            if (n === 3) {
+                solveGroup.classList.remove('hidden');
+                solveGroup.style.display = 'flex';
+            } else {
+                solveGroup.classList.add('hidden');
+                solveGroup.style.display = 'none';
+                // Also close solution panel if it was open
+                closeSolution();
+            }
+        }
 
         // Animate the camera back to the default view first
         // This ensures a smooth transition when changing cube sizes
@@ -780,4 +810,66 @@ function stopMoves() {
     stopAutomoves = true;
     document.getElementById('stopButton').classList.add('hidden');
     console.log('Moves stopped');
+}
+
+// ==================== CUBIE COLORING ====================
+// Applies a specific color to a cubie face at the given coordinates
+function applyCubieColor() {
+    if (!cubeEngine) return;
+
+    const faceStr = document.getElementById('colorFaceSelect').value;
+    const colorStr = document.getElementById('colorSelect').value;
+    const x = parseInt(document.getElementById('colorXInput').value);
+    const y = parseInt(document.getElementById('colorYInput').value);
+
+    // Validate inputs
+    const cubeSize = parseInt(document.getElementById('cubeSizeInput').value);
+    if (isNaN(x) || isNaN(y) || x < 0 || y < 0 || x >= cubeSize || y >= cubeSize) {
+        alert(`Please enter valid X and Y coordinates between 0 and ${cubeSize - 1}.`);
+        return;
+    }
+
+    try {
+        const faceEnum = Module.FaceEnum[faceStr];
+        const colorEnum = Module.Color[colorStr];
+
+        console.log(`Setting color ${colorStr} at Face: ${faceStr}, X: ${x}, Y: ${y}`);
+        cubeEngine.set_cubie_color(faceEnum, x, y, colorEnum);
+
+        // Fetch the updated cube state from C++ and re-render
+        const cube_data = JSON.parse(cubeEngine.get_cube_state_JSON());
+        create_cube_from_json(cube_data);
+    } catch (e) {
+        console.error("Error setting cubie color:", e);
+        alert("Failed to set cubie color. Check console for details.");
+    }
+}
+
+// Clears all colors from the cube by setting them to EMPTY
+function clearCubeColors() {
+    if (!cubeEngine) return;
+
+    const cubeSize = parseInt(document.getElementById('cubeSizeInput').value);
+    const faces = ['UP', 'DOWN', 'LEFT', 'RIGHT', 'FRONT', 'BACK'];
+    const colorEnum = Module.Color['EMPTY'];
+
+    try {
+        console.log("Clearing all cube colors...");
+        // Iterate over all faces and all coordinates
+        for (const faceStr of faces) {
+            const faceEnum = Module.FaceEnum[faceStr];
+            for (let i = 0; i < cubeSize; i++) {
+                for (let j = 0; j < cubeSize; j++) {
+                    cubeEngine.set_cubie_color(faceEnum, i, j, colorEnum);
+                }
+            }
+        }
+        
+        // Fetch the updated cube state from C++ and re-render
+        const cube_data = JSON.parse(cubeEngine.get_cube_state_JSON());
+        create_cube_from_json(cube_data);
+    } catch (e) {
+        console.error("Error clearing cube colors:", e);
+        alert("Failed to clear cube colors. Check console for details.");
+    }
 }

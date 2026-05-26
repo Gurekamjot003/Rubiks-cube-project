@@ -93,6 +93,7 @@ public:
         Coordinate target(i, j);
         std::unique_ptr<CubieColorSetter> setter = std::make_unique<CubieColorSetter>(camera.get(), cube.get());
         setter->set_color(face, target, color);
+        display_cube();
     }
 
     const FaceEnum get_front_face()

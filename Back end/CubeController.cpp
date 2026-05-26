@@ -1,5 +1,6 @@
 #include "CubeController.hpp"
 #include "Cube/FaceEnum.hpp"
+#include "Cube/Color.hpp"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/bind.h>
@@ -8,6 +9,15 @@ using namespace emscripten;
 
 EMSCRIPTEN_BINDINGS(my_module)
 {
+    enum_<Color>("Color")
+        .value("WHITE", Color::WHITE)
+        .value("YELLOW", Color::YELLOW)
+        .value("BLUE", Color::BLUE)
+        .value("GREEN", Color::GREEN)
+        .value("RED", Color::RED)
+        .value("ORANGE", Color::ORANGE)
+        .value("EMPTY", Color::EMPTY);
+
     enum_<FaceEnum>("FaceEnum")
         .value("UP", FaceEnum::UP)
         .value("DOWN", FaceEnum::DOWN)
