@@ -2,8 +2,6 @@
 
 A high-performance 3x3x3 Rubik's Cube engine and Layer-by-Layer (LBL) solver, written in modern C++17, paired with an interactive 3D web visualizer built with Three.js and WebAssembly.
 
-**[Live Demo Link Here]**
-
 ---
 
 ## Overview
