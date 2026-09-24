@@ -64,8 +64,6 @@ The project separates core logic from the presentation layer across two independ
    - Open the `Front end/` directory's entry HTML file in a browser, or serve it with a local static server.
    - The page loads the compiled WASM module and connects it to the Three.js visualizer.
 
-*(If your actual build steps differ — e.g. specific CMake flags, Emscripten version, or a dev server command — swap this section for the exact commands so anyone cloning the repo can build it without guessing.)*
-
 ---
 
 ## Project Status
